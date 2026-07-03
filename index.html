@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>每日健身看板 · 增肌计划</title>
+<style>
+  :root{
+    --bg:#0e1116;
+    --bg-soft:#151a21;
+    --card:#1b222c;
+    --card-2:#212a35;
+    --line:#2b3543;
+    --text:#e8edf3;
+    --muted:#93a1b3;
+    --faint:#66748a;
+    --accent:#22c55e;      /* 主色 · 完成 */
+    --today:#f59e0b;       /* 今日高亮 */
+    --lower:#f97316;       /* 下肢 */
+    --upper:#3b82f6;       /* 上肢 */
+    --cardio:#14b8a6;      /* 有氧 */
+    --rest:#8b98a9;        /* 休息 */
+    --radius:16px;
+    --shadow:0 10px 30px rgba(0,0,0,.35);
+    font-synthesis:none;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:
+      radial-gradient(1200px 600px at 80% -10%, rgba(245,158,11,.10), transparent 60%),
+      radial-gradient(1000px 500px at -10% 10%, rgba(34,197,94,.08), transparent 55%),
+      var(--bg);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    line-height:1.55;
+    padding:0 16px 120px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1120px;margin:0 auto}
+
+  /* ---------- Header ---------- */
+  header{padding:30px 0 8px}
+  .kicker{color:var(--muted);font-size:13px;letter-spacing:.14em;text-transform:uppercase;font-weight:600}
+  h1{font-size:clamp(24px,4vw,34px);font-weight:800;letter-spacing:-.02em;margin-top:4px}
+  h1 .grad{background:linear-gradient(90deg,var(--today),#fb7185);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .datebar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:10px;color:var(--muted);font-size:14px}
+  .dot{width:5px;height:5px;border-radius:50%;background:var(--faint)}
+
+  /* ---------- Today hero ---------- */
+  .hero{
+    margin-top:20px;position:relative;overflow:hidden;
+    background:linear-gradient(135deg,rgba(245,158,11,.16),rgba(251,113,133,.08)),var(--card);
+    border:1px solid rgba(245,158,11,.35);
+    border-radius:var(--radius);
+    padding:22px;box-shadow:var(--shadow);
+  }
+  .hero::before{content:"";position:absolute;inset:0;background:radial-gradient(400px 200px at 90% 0,rgba(245,158,11,.18),transparent 70%);pointer-events:none}
+  .hero-top{display:flex;flex-wrap:wrap;justify-content:space-between;gap:14px;align-items:flex-start;position:relative}
+  .badge-today{display:inline-flex;align-items:center;gap:7px;background:var(--today);color:#1a1205;font-weight:800;font-size:12px;letter-spacing:.08em;padding:5px 11px;border-radius:999px}
+  .badge-today .pulse{width:7px;height:7px;border-radius:50%;background:#1a1205;animation:pulse 1.6s infinite}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.7)}}
+  .hero h2{font-size:clamp(22px,4.5vw,30px);font-weight:800;margin-top:12px;letter-spacing:-.01em}
+  .hero .focus{color:var(--muted);margin-top:6px;font-size:15px}
+  .hero-cta{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+  .btn{border:0;cursor:pointer;font-weight:700;font-size:14px;border-radius:11px;padding:11px 16px;transition:.15s;font-family:inherit}
+  .btn-primary{background:var(--today);color:#1a1205}
+  .btn-primary:hover{filter:brightness(1.08)}
+  .btn-ghost{background:rgba(255,255,255,.06);color:var(--text);border:1px solid var(--line)}
+  .btn-ghost:hover{background:rgba(255,255,255,.11)}
+  .ring{position:relative;width:76px;height:76px;flex-shrink:0}
+  .ring svg{transform:rotate(-90deg)}
+  .ring .val{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:800;font-size:17px}
+  .ring .val small{font-size:10px;color:var(--muted);font-weight:600}
+
+  /* ---------- Section ---------- */
+  section{margin-top:38px}
+  .sec-head{display:flex;align-items:baseline;gap:10px;margin-bottom:16px}
+  .sec-head h3{font-size:19px;font-weight:800;letter-spacing:-.01em}
+  .sec-head span{color:var(--faint);font-size:13px}
+  .sec-line{flex:1;height:1px;background:linear-gradient(90deg,var(--line),transparent)}
+
+  /* ---------- Weekly kanban ---------- */
+  .kanban{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}
+  .col{
+    background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:13px 11px;min-height:132px;display:flex;flex-direction:column;gap:8px;
+    position:relative;transition:.18s;cursor:pointer;text-decoration:none;color:inherit;
+  }
+  .col:hover{transform:translateY(-3px);border-color:var(--faint)}
+  .col .day{font-size:12px;color:var(--muted);font-weight:700;display:flex;justify-content:space-between;align-items:center}
+  .col .date{color:var(--faint);font-weight:600;font-size:11px}
+  .col .ico{font-size:22px;line-height:1}
+  .col .nm{font-weight:800;font-size:14px;letter-spacing:-.01em;margin-top:auto}
+  .col .tg{font-size:11px;color:var(--muted)}
+  .cat-strip{height:4px;border-radius:99px;width:34px}
+  .col.lower .cat-strip{background:var(--lower)} .col.upper .cat-strip{background:var(--upper)}
+  .col.cardio .cat-strip{background:var(--cardio)} .col.rest .cat-strip{background:var(--rest)}
+  .col.is-today{
+    border-color:var(--today);background:linear-gradient(160deg,rgba(245,158,11,.16),transparent 60%),var(--card);
+    box-shadow:0 0 0 1px var(--today),0 12px 26px rgba(245,158,11,.16);transform:translateY(-3px);
+  }
+  .col.is-today .day{color:var(--today)}
+  .mini-badge{position:absolute;top:-9px;right:8px;background:var(--today);color:#1a1205;font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;letter-spacing:.05em}
+  .done-check{position:absolute;top:9px;right:9px;width:18px;height:18px;border-radius:50%;background:var(--accent);color:#04140a;display:none;align-items:center;justify-content:center;font-size:12px;font-weight:900}
+  .col.done .done-check{display:flex}
+
+  /* ---------- Day detail cards ---------- */
+  .days{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px}
+  .daycard{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;transition:.18s;scroll-margin-top:16px}
+  .daycard.is-today{border-color:var(--today);box-shadow:0 0 0 1px var(--today),var(--shadow)}
+  .dc-head{padding:15px 17px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--line);position:relative}
+  .dc-head .ico{font-size:26px}
+  .dc-head .t{font-weight:800;font-size:16px}
+  .dc-head .s{font-size:12px;color:var(--muted)}
+  .dc-head.lower{background:linear-gradient(90deg,rgba(249,115,22,.14),transparent)}
+  .dc-head.upper{background:linear-gradient(90deg,rgba(59,130,246,.14),transparent)}
+  .dc-head.cardio{background:linear-gradient(90deg,rgba(20,184,166,.14),transparent)}
+  .dc-head.rest{background:linear-gradient(90deg,rgba(139,152,169,.12),transparent)}
+  .dc-head .todaytag{margin-left:auto;background:var(--today);color:#1a1205;font-size:10px;font-weight:800;padding:3px 9px;border-radius:99px}
+  .ex{display:flex;align-items:flex-start;gap:12px;padding:12px 17px;border-bottom:1px solid rgba(43,53,67,.6);transition:.12s}
+  .ex:last-child{border-bottom:0}
+  .ex label.cbx{position:relative;flex-shrink:0;width:22px;height:22px;margin-top:1px;cursor:pointer}
+  .ex .cbx input{position:absolute;opacity:0;width:100%;height:100%;cursor:pointer;margin:0}
+  .ex .cbx .box{position:absolute;inset:0;border:2px solid var(--faint);border-radius:7px;transition:.15s}
+  .ex .cbx input:checked ~ .box{background:var(--accent);border-color:var(--accent)}
+  .ex .cbx .box::after{content:"";position:absolute;left:6px;top:2px;width:5px;height:10px;border:solid #04140a;border-width:0 2.5px 2.5px 0;transform:rotate(45deg) scale(0);transition:.15s}
+  .ex .cbx input:checked ~ .box::after{transform:rotate(45deg) scale(1)}
+  .ex .body{flex:1;min-width:0}
+  .ex .nm{font-weight:700;font-size:14.5px}
+  .ex.checked .nm{text-decoration:line-through;color:var(--faint)}
+  .ex .meta{font-size:12.5px;color:var(--muted);margin-top:2px}
+  .ex .meta b{color:var(--text);font-weight:700}
+  .ex .note{font-size:12px;color:var(--faint);margin-top:3px}
+  .ex .vid-link{flex-shrink:0;align-self:center;display:inline-flex;align-items:center;gap:4px;background:rgba(255,42,42,.12);color:#ff6b6b;border:1px solid rgba(255,42,42,.28);border-radius:8px;padding:6px 10px;font-size:11.5px;font-weight:800;text-decoration:none;white-space:nowrap;transition:.15s}
+  .ex .vid-link:hover{background:#ff2a2a;color:#fff;border-color:#ff2a2a;transform:scale(1.05)}
+  .dc-foot{padding:12px 17px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--bg-soft)}
+  .dc-foot .rest-i{font-size:12.5px;color:var(--muted)}
+  .link-btn{background:none;border:1px solid var(--line);color:var(--muted);font-size:12px;padding:6px 11px;border-radius:8px;cursor:pointer;font-family:inherit;font-weight:600;transition:.15s}
+  .link-btn:hover{color:var(--text);border-color:var(--faint)}
+  .prog-mini{margin-left:auto;font-size:12px;color:var(--muted);font-weight:700}
+  .prog-mini b{color:var(--accent)}
+
+  /* ---------- Generic info cards ---------- */
+  .grid{display:grid;gap:14px}
+  .g-2{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+  .g-3{grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+  .g-4{grid-template-columns:repeat(auto-fit,minmax(155px,1fr))}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px}
+  .card h4{font-size:15px;font-weight:800;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+  .card .sub{color:var(--faint);font-size:12px;margin-bottom:10px}
+  .meal-item{font-size:13.5px;color:var(--muted);padding:4px 0;display:flex;gap:8px}
+  .meal-item::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent);margin-top:8px;flex-shrink:0}
+  .macro{font-size:12.5px;color:var(--faint);margin-top:9px;padding-top:9px;border-top:1px dashed var(--line)}
+  .macro b{color:var(--text)}
+
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;text-align:center}
+  .stat .n{font-size:22px;font-weight:800;letter-spacing:-.02em}
+  .stat .n.amber{color:var(--today)} .stat .n.green{color:var(--accent)} .stat .n.blue{color:var(--upper)} .stat .n.teal{color:var(--cardio)}
+  .stat .l{font-size:12px;color:var(--muted);margin-top:3px}
+
+  /* progression timeline */
+  .weeks{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+  .wk{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;position:relative;overflow:hidden}
+  .wk::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent)}
+  .wk .no{font-size:12px;font-weight:800;color:var(--accent);letter-spacing:.05em}
+  .wk .ti{font-weight:800;margin-top:3px;font-size:15px}
+  .wk p{color:var(--muted);font-size:13px;margin-top:7px}
+  .wk .eg{color:var(--faint);font-size:12px;margin-top:8px;background:var(--bg-soft);padding:8px 10px;border-radius:8px}
+
+  .goal-list{list-style:none;display:grid;gap:9px}
+  .goal-list li{display:flex;gap:10px;align-items:flex-start;font-size:14px;color:var(--muted)}
+  .goal-list li::before{content:"✓";color:var(--accent);font-weight:900;flex-shrink:0}
+  .callout{margin-top:14px;background:linear-gradient(135deg,rgba(34,197,94,.12),transparent),var(--card);border:1px solid rgba(34,197,94,.3);border-radius:14px;padding:16px;font-size:13.5px;color:var(--muted)}
+  .callout b{color:var(--text)}
+
+  .info-pill{display:inline-flex;align-items:center;gap:7px;background:var(--card);border:1px solid var(--line);border-radius:99px;padding:7px 13px;font-size:13px;color:var(--muted);font-weight:600}
+  .info-pill b{color:var(--text)}
+  .pills{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}
+
+  /* ---------- Rest Timer (floating) ---------- */
+  .timer{
+    position:fixed;right:18px;bottom:18px;z-index:50;width:220px;
+    background:var(--card-2);border:1px solid var(--line);border-radius:18px;
+    box-shadow:0 18px 40px rgba(0,0,0,.5);padding:15px;
+    transform:translateY(140%);transition:transform .3s cubic-bezier(.2,.8,.25,1);
+  }
+  .timer.open{transform:translateY(0)}
+  .timer .th{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .timer .th span{font-size:12px;font-weight:800;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+  .timer .th button{background:none;border:0;color:var(--faint);font-size:18px;cursor:pointer;line-height:1}
+  .timer .disp{font-size:40px;font-weight:800;text-align:center;font-variant-numeric:tabular-nums;letter-spacing:-.02em;color:var(--text)}
+  .timer .disp.run{color:var(--today)}
+  .timer .presets{display:flex;gap:6px;justify-content:center;margin:8px 0}
+  .timer .presets button{flex:1;background:var(--bg-soft);border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:6px 0;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:.12s}
+  .timer .presets button:hover,.timer .presets button.on{color:var(--text);border-color:var(--today);background:rgba(245,158,11,.12)}
+  .timer .ctrl{display:flex;gap:7px}
+  .timer .ctrl button{flex:1;border:0;border-radius:9px;padding:9px 0;font-weight:800;font-size:13px;cursor:pointer;font-family:inherit}
+  .timer .start{background:var(--today);color:#1a1205}
+  .timer .reset{background:rgba(255,255,255,.07);color:var(--text)}
+  .timer-fab{
+    position:fixed;right:18px;bottom:18px;z-index:49;width:56px;height:56px;border-radius:50%;
+    background:var(--today);color:#1a1205;border:0;cursor:pointer;font-size:24px;
+    box-shadow:0 12px 28px rgba(245,158,11,.4);display:flex;align-items:center;justify-content:center;
+    transition:transform .2s;
+  }
+  .timer-fab:hover{transform:scale(1.08)}
+  .timer-fab.hide{display:none}
+
+  /* ---------- 休息结束 · 全屏弹窗 ---------- */
+  .rest-over{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;
+    background:rgba(8,11,15,.74);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);padding:24px}
+  .rest-over.show{display:flex;animation:roFade .2s ease}
+  @keyframes roFade{from{opacity:0}to{opacity:1}}
+  .ro-card{text-align:center;max-width:360px;width:100%;padding:40px 30px;border-radius:26px;
+    background:linear-gradient(165deg,rgba(34,197,94,.20),transparent 60%),var(--card-2);
+    border:1px solid rgba(34,197,94,.45);box-shadow:0 30px 80px rgba(0,0,0,.6);
+    animation:roPop .4s cubic-bezier(.2,.9,.3,1.35)}
+  @keyframes roPop{from{transform:scale(.82);opacity:0}to{transform:scale(1);opacity:1}}
+  .ro-ico{font-size:66px;line-height:1;animation:roBounce 1s ease-in-out infinite}
+  @keyframes roBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+  .ro-title{font-size:30px;font-weight:800;color:var(--accent);margin-top:14px;letter-spacing:-.01em}
+  .ro-sub{font-size:16px;color:var(--muted);margin-top:6px}
+  .ro-btn{margin-top:24px;width:100%;border:0;border-radius:14px;padding:16px;cursor:pointer;
+    font-family:inherit;font-size:16px;font-weight:800;background:var(--accent);color:#04140a;transition:.15s}
+  .ro-btn:hover{filter:brightness(1.08)}
+  .ro-btn:active{transform:scale(.98)}
+  .ro-hint{margin-top:13px;font-size:11.5px;color:var(--faint)}
+
+  footer{margin-top:44px;text-align:center;color:var(--faint);font-size:12.5px;line-height:1.8}
+
+  /* ===== 平板 ===== */
+  @media (max-width:900px){
+    .kanban{grid-template-columns:repeat(4,1fr)}
+  }
+
+  /* ===== 手机 ===== */
+  @media (max-width:640px){
+    body{padding:0 12px 108px;overflow-x:hidden}
+    header{padding:22px 0 6px}
+    .datebar{font-size:12.5px;gap:6px 8px}
+    section{margin-top:30px}
+    .sec-head{flex-wrap:wrap;gap:4px 10px}
+
+    /* 今日 hero：完成度环放到右上角 */
+    .hero{padding:17px}
+    .hero h2{margin-top:10px;padding-right:58px}
+    .hero .focus{font-size:14px}
+    .hero .ring{position:absolute;top:15px;right:15px;width:54px;height:54px}
+    .hero .ring svg{width:100%;height:100%}
+    .hero .ring .val{font-size:12px}
+    .hero .ring .val small{font-size:8px}
+    .hero-cta{gap:8px}
+    .hero-cta .btn{flex:1;text-align:center;padding:12px 8px;font-size:13.5px}
+
+    /* 看板：横向滑动卡片条（scroll-snap） */
+    .kanban{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;
+      margin:0 -12px;padding:12px 12px 10px;position:relative;-webkit-overflow-scrolling:touch}
+    .kanban::-webkit-scrollbar{height:0}
+    .col{flex:0 0 134px;scroll-snap-align:center;min-height:120px}
+
+    /* 多列区块改为单列，避免溢出 */
+    .days,.weeks,.grid.g-2{grid-template-columns:1fr}
+    .grid.g-4{grid-template-columns:repeat(2,1fr)}
+    .stat .n{font-size:19px}
+
+    /* 动作行与按钮更适合手指点击 */
+    .dc-head{padding:14px}
+    .ex{padding:13px 14px;gap:10px}
+    .ex .vid-link{padding:8px 10px}
+    .link-btn{padding:8px 13px}
+
+    /* 计时器：底部悬浮条 */
+    .timer{left:12px;right:12px;width:auto;bottom:12px}
+    .timer-fab{right:14px;bottom:14px;width:52px;height:52px;font-size:22px}
+  }
+
+  /* ===== 小屏手机 ===== */
+  @media (max-width:400px){
+    h1{font-size:23px}
+    .hero-cta{flex-direction:column}
+    .hero-cta .btn{width:100%;flex:none}
+    .col{flex-basis:124px}
+    .info-pill{font-size:12px;padding:6px 10px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="kicker">增肌计划 · 居家阶段（第 1 个月）</div>
+    <h1>每日健身 <span class="grad">看板</span></h1>
+    <div class="datebar">
+      <span id="today-date"></span><span class="dot"></span>
+      <span id="week-range"></span><span class="dot"></span>
+      <span>目标：142 → 150 lb · 重点大腿 / 臀腿后侧</span>
+    </div>
+    <div class="pills">
+      <span class="info-pill">🎯 <b>增肌</b> · 长期习惯</span>
+      <span class="info-pill">📏 身高 <b>180 cm</b></span>
+      <span class="info-pill">⚖️ 体重 <b>142 lb</b></span>
+      <span class="info-pill">🏋️ 器械 <b>6 kg 壶铃 + 瑜伽垫</b></span>
+      <span class="info-pill">⏱️ 单次 <b>40–50 分钟</b></span>
+    </div>
+  </header>
+
+  <!-- TODAY HERO -->
+  <div class="hero" id="hero">
+    <div class="hero-top">
+      <div>
+        <span class="badge-today"><span class="pulse"></span> 今日训练</span>
+        <h2 id="hero-name">—</h2>
+        <div class="focus" id="hero-focus">—</div>
+        <div class="hero-cta">
+          <button class="btn btn-primary" onclick="scrollToToday()">查看今日动作 ↓</button>
+          <button class="btn btn-ghost" onclick="openTimer()">⏱️ 打开休息计时器</button>
+        </div>
+      </div>
+      <div class="ring" title="今日完成度">
+        <svg width="76" height="76" viewBox="0 0 76 76">
+          <circle cx="38" cy="38" r="32" stroke="rgba(255,255,255,.1)" stroke-width="7" fill="none"/>
+          <circle id="ring-fg" cx="38" cy="38" r="32" stroke="var(--today)" stroke-width="7" fill="none" stroke-linecap="round" stroke-dasharray="201" stroke-dashoffset="201"/>
+        </svg>
+        <div class="val"><span id="ring-pct">0%</span><small>今日</small></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WEEKLY KANBAN -->
+  <section>
+    <div class="sec-head"><h3>本周训练安排</h3><span>点击卡片跳转当天动作</span><div class="sec-line"></div></div>
+    <div class="kanban" id="kanban"></div>
+  </section>
+
+  <!-- DAY DETAILS -->
+  <section>
+    <div class="sec-head"><h3>每日动作详情</h3><span>勾选打卡 · 点 ▶ 教程 看 YouTube 视频 · 进度自动保存</span><div class="sec-line"></div></div>
+    <div class="days" id="days"></div>
+  </section>
+
+  <!-- DIET -->
+  <section>
+    <div class="sec-head"><h3>饮食计划</h3><span>每日目标</span><div class="sec-line"></div></div>
+    <div class="grid g-4" style="margin-bottom:16px">
+      <div class="stat"><div class="n amber">2500–2700</div><div class="l">热量 (kcal)</div></div>
+      <div class="stat"><div class="n green">120–140 g</div><div class="l">蛋白质</div></div>
+      <div class="stat"><div class="n blue">300–350 g</div><div class="l">碳水</div></div>
+      <div class="stat"><div class="n teal">60–70 g</div><div class="l">脂肪</div></div>
+    </div>
+    <div class="grid g-2" id="meals"></div>
+  </section>
+
+  <!-- PROGRESSION -->
+  <section>
+    <div class="sec-head"><h3>每周递进计划</h3><span>渐进超负荷</span><div class="sec-line"></div></div>
+    <div class="weeks" id="weeks"></div>
+  </section>
+
+  <!-- RECOVERY + TRACKING -->
+  <section>
+    <div class="sec-head"><h3>恢复 & 每周记录</h3><span>坚持才有结果</span><div class="sec-line"></div></div>
+    <div class="grid g-2">
+      <div class="card">
+        <h4>🛌 每日恢复</h4>
+        <div class="grid g-3" style="margin-top:12px">
+          <div class="stat"><div class="n">7.5–8.5 h</div><div class="l">睡眠</div></div>
+          <div class="stat"><div class="n">2.5–3 L</div><div class="l">饮水</div></div>
+          <div class="stat"><div class="n">7k–10k</div><div class="l">步数</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <h4>📓 每周记录（周日早晨）</h4>
+        <div class="sub">记录体重 · 腿围（每两周）· 训练重量 · 完成情况</div>
+        <ul class="goal-list">
+          <li>目标：每周增加 <b style="color:var(--text)">0.25–0.5 kg</b></li>
+          <li>连续两周体重没变 → 每天 <b style="color:var(--text)">+200 kcal</b></li>
+        </ul>
+        <div class="callout" style="margin-top:12px">加餐示例：多一碗米饭 · 或两片全麦面包 · 或一杯牛奶。</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ONE MONTH GOAL -->
+  <section>
+    <div class="sec-head"><h3>一个月目标</h3><span>完成后应达到</span><div class="sec-line"></div></div>
+    <div class="card">
+      <ul class="goal-list" style="grid-template-columns:repeat(auto-fit,minmax(240px,1fr));display:grid">
+        <li>每周稳定训练 <b style="color:var(--text)">4 次</b></li>
+        <li>建立长期训练习惯</li>
+        <li>腿部力量明显提高</li>
+        <li>大腿围略有增加</li>
+        <li>体重增加约 <b style="color:var(--text)">1–2 kg</b></li>
+        <li>熟练完成所有基础动作</li>
+        <li>准备进入健身房正式增肌</li>
+      </ul>
+      <div class="callout">
+        <b>下一阶段：</b>进入健身房后升级为《12 周健身房增肌计划（Push / Pull / Legs）》——
+        含每个动作起始重量、每周渐进加重、按体重自动调整饮食、每月体型评估，
+        以及 <b>142 lb → 约 155 lb</b> 的完整路线图。
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    每日打卡与今日高亮会随日期自动更新 · 进度保存在本浏览器<br>
+    保持标准姿势 > 增加重量。加油，Jacky 💪
+  </footer>
+</div>
+
+<!-- Rest Timer -->
+<button class="timer-fab" id="fab" onclick="openTimer()" title="休息计时器">⏱️</button>
+<div class="timer" id="timer">
+  <div class="th"><span>组间休息</span><button onclick="closeTimer()">×</button></div>
+  <div class="disp" id="disp">1:30</div>
+  <div class="presets">
+    <button data-s="60">60s</button>
+    <button data-s="90" class="on">90s</button>
+    <button data-s="120">120s</button>
+  </div>
+  <div class="ctrl">
+    <button class="start" id="startBtn" onclick="toggleTimer()">开始</button>
+    <button class="reset" onclick="resetTimer()">重置</button>
+  </div>
+</div>
+
+<!-- 休息结束 · 全屏提示弹窗 -->
+<div class="rest-over" id="restOver" role="alertdialog" aria-live="assertive" aria-hidden="true">
+  <div class="ro-card">
+    <div class="ro-ico">💥</div>
+    <div class="ro-title">休息结束！</div>
+    <div class="ro-sub">开始下一组 💪</div>
+    <button class="ro-btn" onclick="dismissRestOver()">继续训练</button>
+    <div class="ro-hint">点击任意处 / 按 Esc 关闭 · 12 秒后自动关闭</div>
+  </div>
+</div>
+
+<script>
+/* ============ DATA ============ */
+const CATLABEL={lower:'下肢',upper:'上肢',cardio:'有氧',rest:'休息'};
+const CATICON={lower:'🦵',upper:'💪',cardio:'🚶',rest:'😴'};
+// dow: 0=Sun ... 6=Sat
+const DAYS=[
+  {dow:1,label:'周一',name:'下肢 A',tag:'腿围',cat:'lower',rest:90,
+    focus:'以大重量幅度刺激股四头 + 臀腿，主攻腿围。',
+    ex:[
+      {n:'Goblet Squat',sets:4,reps:'15',note:'壶铃贴胸，下蹲至大腿平行'},
+      {n:'Bulgarian Split Squat',sets:4,reps:'每腿 10–12',note:'后脚垫高，重心压前腿'},
+      {n:'Single-leg Romanian Deadlift',sets:4,reps:'每腿 12',note:'髋部后推，感受腘绳肌'},
+      {n:'Standing Calf Raise',sets:4,reps:'20',note:'顶峰停顿 1 秒'},
+    ]},
+  {dow:2,label:'周二',name:'上肢 A',tag:'推 + 拉',cat:'upper',rest:90,
+    focus:'胸背肩综合，打好上肢基础。',
+    ex:[
+      {n:'Push-up',sets:4,reps:'接近力竭',note:'身体成直线，全程控制'},
+      {n:'Single-arm Row',sets:4,reps:'每侧 12–15',note:'壶铃划船，肩胛后收',v:'kettlebell single arm row proper form'},
+      {n:'Overhead Press',sets:3,reps:'每侧 12',note:'核心收紧，避免塌腰',v:'kettlebell single arm overhead press proper form'},
+      {n:'Plank',sets:3,reps:'45–60 秒',note:'臀腹发力'},
+    ]},
+  {dow:3,label:'周三',name:'快走 + 拉伸',tag:'主动恢复',cat:'cardio',rest:0,
+    focus:'低强度有氧促进恢复，配合拉伸放松腿部。',
+    ex:[
+      {n:'快走',sets:'—',reps:'30–40 分钟',note:'能说话的强度，轻微出汗',v:'brisk walking workout 快走 减脂'},
+      {n:'全身拉伸',sets:'—',reps:'10 分钟',note:'重点髋部、大腿前后侧',v:'10分钟 全身拉伸 跟练 full body stretch'},
+    ]},
+  {dow:4,label:'周四',name:'下肢 B',tag:'臀腿后侧',cat:'lower',rest:90,
+    focus:'臀部与腘绳肌为主，塑造后链线条。',
+    ex:[
+      {n:'Kettlebell Swing',sets:4,reps:'20',note:'臀部发力，不用手臂抬'},
+      {n:'Single-leg Romanian Deadlift',sets:4,reps:'每腿 12',note:'下放控制 3–4 秒'},
+      {n:'Bulgarian Split Squat',sets:3,reps:'每腿 15',note:'稳定控制'},
+      {n:'Single-leg Glute Bridge',sets:4,reps:'每腿 15',note:'顶端夹紧臀部'},
+    ]},
+  {dow:5,label:'周五',name:'上肢 B + 核心',tag:'推 + 核心',cat:'upper',rest:90,
+    focus:'上肢补强 + 核心，收尾一周训练。',
+    ex:[
+      {n:'Close-grip Push-up',sets:4,reps:'接近力竭',note:'手距窄，主攻肱三头'},
+      {n:'Floor Press',sets:3,reps:'每侧 15',note:'仰卧壶铃推',v:'kettlebell floor press proper form'},
+      {n:'Single-arm Row',sets:3,reps:'每侧 15',note:'背部收缩',v:'kettlebell single arm row proper form'},
+      {n:'Russian Twist',sets:3,reps:'20',note:'左右各算半次组合计数'},
+      {n:'Plank',sets:3,reps:'60 秒',note:'保持稳定'},
+    ]},
+  {dow:6,label:'周六',name:'轻有氧',tag:'30–60 分钟',cat:'cardio',rest:0,
+    focus:'低强度有氧，提升心肺、帮助恢复。',
+    ex:[
+      {n:'轻有氧',sets:'—',reps:'30–60 分钟',note:'快走 / 骑行 / 慢跑，低强度',v:'30分钟 低强度 有氧 跟练 low impact cardio'},
+    ]},
+  {dow:0,label:'周日',name:'休息',tag:'完全休息',cat:'rest',rest:0,
+    focus:'让身体充分恢复，为下周做准备。',
+    ex:[
+      {n:'完全休息',sets:'—',reps:'全天',note:'可做 5–10 分钟轻度拉伸或散步',v:'睡前 放松 拉伸 跟练 relaxing stretch before bed'},
+    ]},
+];
+
+const MEALS=[
+  {t:'早餐',ico:'🌅',items:['燕麦 80 g','牛奶 500 ml','鸡蛋 3 个','香蕉 1 根'],p:'40 g',c:'80 g'},
+  {t:'午餐',ico:'🍱',items:['米饭 250 g','鸡胸肉 200 g','西兰花','少量橄榄油'],p:'60 g',c:'70 g'},
+  {t:'下午加餐（训练前）',ico:'🥪',items:['希腊酸奶 200 g','全麦面包 4 片'],p:'30 g',c:'60 g'},
+  {t:'晚餐（训练后）',ico:'🍚',items:['米饭 300 g','牛肉 180 g','蔬菜'],p:'45 g',c:'85 g'},
+  {t:'睡前（可选）',ico:'🌙',items:['牛奶 300 ml','或 希腊酸奶'],p:'—',c:'—'},
+];
+
+const WEEKS=[
+  {no:'WEEK 1',ti:'学习动作',p:'掌握每个动作模式，保持标准姿势，宁轻勿错。',eg:''},
+  {no:'WEEK 2',ti:'增加容量',p:'所有动作增加 1 组，提升训练量。',eg:'例：Goblet Squat 4 → 5 组'},
+  {no:'WEEK 3',ti:'增加张力',p:'保持组数，所有下蹲类动作放慢节奏，增加肌肉张力。',eg:'下放 4 秒 · 底部停 2 秒'},
+  {no:'WEEK 4',ti:'接近力竭',p:'做到 RIR 1–2，最后一组几乎做不起来即可。',eg:'留 1–2 次余量'},
+];
+
+/* ============ WEEK / DATE HELPERS ============ */
+function getMonday(base){
+  const d=new Date(base); const day=d.getDay();
+  const diff=(day===0?-6:1-day);
+  d.setDate(d.getDate()+diff); d.setHours(0,0,0,0); return d;
+}
+function fmt(d){return (d.getMonth()+1)+'月'+d.getDate()+'日';}
+function dateKey(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+
+const now=new Date();
+const todayDow=now.getDay();
+const monday=getMonday(now);
+// map each DAYS entry (Mon..Sun order) to a real date this week
+DAYS.forEach((d,i)=>{ const dt=new Date(monday); dt.setDate(monday.getDate()+i); d.date=dt; d.key=dateKey(dt); });
+const todayObj=DAYS.find(d=>d.dow===todayDow);
+
+/* ============ STORAGE ============ */
+const LS='fitkanban_v1';
+function loadState(){try{return JSON.parse(localStorage.getItem(LS))||{}}catch(e){return{}}}
+function saveState(s){try{localStorage.setItem(LS,JSON.stringify(s))}catch(e){}}
+let state=loadState();
+function isChecked(dayKey,i){return !!(state[dayKey]&&state[dayKey][i])}
+function setChecked(dayKey,i,v){state[dayKey]=state[dayKey]||{};state[dayKey][i]=v;saveState(state)}
+
+/* ============ RENDER ============ */
+const WD=['周日','周一','周二','周三','周四','周五','周六'];
+document.getElementById('today-date').textContent=
+  now.getFullYear()+'年'+fmt(now)+' '+WD[todayDow];
+document.getElementById('week-range').textContent=
+  '本周 '+fmt(monday)+' – '+fmt(DAYS[6].date);
+
+// hero
+document.getElementById('hero-name').textContent=todayObj.name+(todayObj.tag?'  ·  '+todayObj.tag:'');
+document.getElementById('hero-focus').textContent=todayObj.focus;
+
+// kanban
+const kb=document.getElementById('kanban');
+DAYS.forEach((d,i)=>{
+  const a=document.createElement('a');
+  a.href='#day-'+d.dow;
+  a.className='col '+d.cat+(d.dow===todayDow?' is-today':'');
+  a.id='kb-'+d.dow;
+  a.innerHTML=`
+    ${d.dow===todayDow?'<span class="mini-badge">今日</span>':''}
+    <span class="done-check">✓</span>
+    <div class="day"><span>${d.label}</span><span class="date">${fmt(d.date)}</span></div>
+    <div class="ico">${CATICON[d.cat]}</div>
+    <div>
+      <div class="cat-strip"></div>
+      <div class="nm">${d.name}</div>
+      <div class="tg">${d.tag}</div>
+    </div>`;
+  kb.appendChild(a);
+});
+
+// day detail cards
+const daysEl=document.getElementById('days');
+DAYS.forEach(d=>{
+  const card=document.createElement('div');
+  card.className='daycard'+(d.dow===todayDow?' is-today':'');
+  card.id='day-'+d.dow;
+  const exHTML=d.ex.map((e,i)=>`
+    <div class="ex" data-day="${d.key}" data-i="${i}">
+      <label class="cbx"><input type="checkbox" ${isChecked(d.key,i)?'checked':''}
+        onchange="onCheck('${d.key}',${i},this)"><span class="box"></span></label>
+      <div class="body">
+        <div class="nm">${e.n}</div>
+        <div class="meta">${e.sets!=='—'?'<b>'+e.sets+'</b> 组 × ':''}<b>${e.reps}</b></div>
+        ${e.note?`<div class="note">${e.note}</div>`:''}
+      </div>
+      <a class="vid-link" href="https://www.youtube.com/results?search_query=${encodeURIComponent(e.v||e.n+' proper form tutorial')}" target="_blank" rel="noopener" title="观看「${e.n}」视频教程">▶ 教程</a>
+    </div>`).join('');
+  card.innerHTML=`
+    <div class="dc-head ${d.cat}">
+      <span class="ico">${CATICON[d.cat]}</span>
+      <div><div class="t">${d.label} · ${d.name}</div><div class="s">${CATLABEL[d.cat]}${d.tag?' · '+d.tag:''}</div></div>
+      ${d.dow===todayDow?'<span class="todaytag">今日</span>':''}
+    </div>
+    ${exHTML}
+    <div class="dc-foot">
+      ${d.rest?`<span class="rest-i">休息 ${d.rest} 秒</span><button class="link-btn" onclick="setTimerAndOpen(${d.rest})">⏱️ 计时</button>`:'<span class="rest-i">主动恢复日</span>'}
+      <button class="link-btn" onclick="resetDay('${d.key}')">重置</button>
+      <span class="prog-mini" id="pm-${d.dow}"></span>
+    </div>`;
+  daysEl.appendChild(card);
+});
+
+// meals
+document.getElementById('meals').innerHTML=MEALS.map(m=>`
+  <div class="card">
+    <h4>${m.ico} ${m.t}</h4>
+    ${m.items.map(x=>`<div class="meal-item">${x}</div>`).join('')}
+    <div class="macro">蛋白质 <b>${m.p}</b> · 碳水 <b>${m.c}</b></div>
+  </div>`).join('');
+
+// weeks
+document.getElementById('weeks').innerHTML=WEEKS.map(w=>`
+  <div class="wk"><div class="no">${w.no}</div><div class="ti">${w.ti}</div>
+  <p>${w.p}</p>${w.eg?`<div class="eg">${w.eg}</div>`:''}</div>`).join('');
+
+/* ============ CHECK / PROGRESS ============ */
+function onCheck(dayKey,i,el){
+  setChecked(dayKey,i,el.checked);
+  el.closest('.ex').classList.toggle('checked',el.checked);
+  updateProgress();
+}
+function resetDay(dayKey){
+  state[dayKey]={};saveState(state);
+  document.querySelectorAll(`.ex[data-day="${dayKey}"]`).forEach(ex=>{
+    const c=ex.querySelector('input');c.checked=false;ex.classList.remove('checked');
+  });
+  updateProgress();
+}
+function updateProgress(){
+  DAYS.forEach(d=>{
+    const total=d.ex.length;
+    let done=0;for(let i=0;i<total;i++) if(isChecked(d.key,i)) done++;
+    const pm=document.getElementById('pm-'+d.dow);
+    if(pm) pm.innerHTML=`<b>${done}</b>/${total}`;
+    const allDone=done===total&&total>0;
+    const kbCol=document.getElementById('kb-'+d.dow);
+    if(kbCol) kbCol.classList.toggle('done',allDone);
+    // mark checked style on load
+    for(let i=0;i<total;i++){
+      const ex=document.querySelector(`.ex[data-day="${d.key}"][data-i="${i}"]`);
+      if(ex) ex.classList.toggle('checked',isChecked(d.key,i));
+    }
+  });
+  // today ring
+  const t=todayObj,total=t.ex.length;let done=0;
+  for(let i=0;i<total;i++) if(isChecked(t.key,i)) done++;
+  const pct=total?Math.round(done/total*100):0;
+  const off=201-201*(pct/100);
+  document.getElementById('ring-fg').style.strokeDashoffset=off;
+  document.getElementById('ring-pct').textContent=pct+'%';
+  document.getElementById('ring-fg').style.stroke=pct===100?'var(--accent)':'var(--today)';
+}
+updateProgress();
+
+function scrollToToday(){document.getElementById('day-'+todayDow).scrollIntoView({behavior:'smooth',block:'start'});}
+
+/* 移动端：加载后把「今日」卡片滚动到看板条中央 */
+function centerTodayInKanban(){
+  const kbEl=document.getElementById('kanban');
+  const tc=document.getElementById('kb-'+todayDow);
+  if(!kbEl||!tc||!window.matchMedia||!window.matchMedia('(max-width:640px)').matches) return;
+  const kr=kbEl.getBoundingClientRect(),cr=tc.getBoundingClientRect();
+  kbEl.scrollLeft+=(cr.left-kr.left)-(kbEl.clientWidth-cr.width)/2;
+}
+requestAnimationFrame(centerTodayInKanban);
+window.addEventListener('orientationchange',()=>setTimeout(centerTodayInKanban,250));
+window.addEventListener('resize',()=>{clearTimeout(window.__rz);window.__rz=setTimeout(centerTodayInKanban,250);});
+
+/* ============ REST TIMER ============ */
+let tSec=90,tRemain=90,tRun=false,tInt=null;
+const disp=document.getElementById('disp'),startBtn=document.getElementById('startBtn'),
+      timerEl=document.getElementById('timer'),fab=document.getElementById('fab');
+function fmtT(s){return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');}
+function renderT(){disp.textContent=fmtT(tRemain);}
+function openTimer(){timerEl.classList.add('open');fab.classList.add('hide');}
+function closeTimer(){timerEl.classList.remove('open');fab.classList.remove('hide');}
+function setPreset(s){tSec=s;tRemain=s;tRun=false;clearInterval(tInt);startBtn.textContent='开始';disp.classList.remove('run');renderT();
+  document.querySelectorAll('.presets button').forEach(b=>b.classList.toggle('on',+b.dataset.s===s));}
+function setTimerAndOpen(s){setPreset(s);openTimer();startTimer();}
+function toggleTimer(){tRun?pauseTimer():startTimer();}
+function startTimer(){
+  ensureAudio();
+  if(tRemain<=0) tRemain=tSec;
+  tRun=true;startBtn.textContent='暂停';disp.classList.add('run');
+  clearInterval(tInt);
+  tInt=setInterval(()=>{
+    tRemain--;renderT();
+    if(tRemain<=0){clearInterval(tInt);tRun=false;startBtn.textContent='开始';disp.classList.remove('run');notifyRestOver();tRemain=tSec;setTimeout(renderT,900);}
+  },1000);
+}
+function pauseTimer(){tRun=false;clearInterval(tInt);startBtn.textContent='继续';disp.classList.remove('run');}
+function resetTimer(){tRun=false;clearInterval(tInt);tRemain=tSec;startBtn.textContent='开始';disp.classList.remove('run');renderT();}
+document.querySelectorAll('.presets button').forEach(b=>b.addEventListener('click',()=>setPreset(+b.dataset.s)));
+/* ---- 音频（需在用户手势后解锁，故在 startTimer 里调用 ensureAudio）---- */
+let audioCtx=null;
+function ensureAudio(){
+  try{
+    if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+    if(audioCtx.state==='suspended') audioCtx.resume();
+  }catch(e){}
+  return audioCtx;
+}
+function chime(ctx,freq,start,dur,vol){
+  const o=ctx.createOscillator(),g=ctx.createGain();
+  o.type='sine';o.frequency.value=freq;o.connect(g);g.connect(ctx.destination);
+  const t=ctx.currentTime+start;
+  g.gain.setValueAtTime(0.0001,t);
+  g.gain.exponentialRampToValueAtTime(vol,t+0.02);
+  g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+  o.start(t);o.stop(t+dur+0.03);
+}
+function beep(){
+  const ctx=ensureAudio(); if(!ctx) return;
+  // 三组上行「叮—叮」，比较醒目
+  [0,0.5,1.0].forEach(s=>{ chime(ctx,880,s,0.16,0.55); chime(ctx,1320,s+0.14,0.22,0.55); });
+}
+function vibrate(){ try{ if(navigator.vibrate) navigator.vibrate([250,120,250,120,400]); }catch(e){} }
+
+/* ---- 休息结束：提示音 + 震动 + 全屏弹窗 ---- */
+let roTimer=null;
+function notifyRestOver(){ beep(); vibrate(); showRestOver(); }
+function showRestOver(){
+  const el=document.getElementById('restOver');
+  el.classList.add('show'); el.setAttribute('aria-hidden','false');
+  clearTimeout(roTimer); roTimer=setTimeout(dismissRestOver,12000);
+}
+function dismissRestOver(){
+  const el=document.getElementById('restOver');
+  el.classList.remove('show'); el.setAttribute('aria-hidden','true');
+  clearTimeout(roTimer);
+}
+document.getElementById('restOver').addEventListener('click',e=>{ if(e.target.id==='restOver') dismissRestOver(); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') dismissRestOver(); });
+setPreset(todayObj.rest||90);
+renderT();
+</script>
+</body>
+</html>
