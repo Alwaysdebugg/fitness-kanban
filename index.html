@@ -283,10 +283,38 @@
     .col{flex-basis:124px}
     .info-pill{font-size:12px;padding:6px 10px}
   }
+  /* ===== cloud sync bar ===== */
+  .syncbar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;
+    background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:9px 13px;margin-bottom:16px;font-size:13px;color:var(--muted)}
+  .sync-dot{width:9px;height:9px;border-radius:50%;background:var(--muted);flex:none;
+    box-shadow:0 0 0 3px rgba(255,255,255,.04);transition:.2s}
+  .sync-spacer{flex:1}
+  .sync-user{color:var(--text);font-weight:600}
+  .sync-btn{border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--text);
+    font-family:inherit;font-weight:700;font-size:13px;border-radius:9px;padding:7px 12px;cursor:pointer;transition:.15s;
+    display:inline-flex;align-items:center;gap:7px}
+  .sync-btn:hover{background:rgba(255,255,255,.11)}
+  .sync-btn:disabled{cursor:default;opacity:.55}
+  .sync-btn.google{background:#fff;color:#1f1f1f;border-color:#fff}
+  .sync-btn.google:hover{filter:brightness(.94)}
 </style>
 </head>
 <body>
 <div class="wrap">
+
+  <!-- CLOUD SYNC BAR -->
+  <div class="syncbar" id="syncbar">
+    <span class="sync-dot" id="sync-dot"></span>
+    <span id="sync-text">本地模式</span>
+    <span class="sync-spacer"></span>
+    <span class="sync-user" id="sync-user" style="display:none"></span>
+    <button class="sync-btn google" id="sync-login">
+      <svg width="15" height="15" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+      用 Google 登录同步
+    </button>
+    <button class="sync-btn" id="sync-logout" style="display:none">退出</button>
+  </div>
 
   <header>
     <div class="kicker">增肌计划 · 居家阶段（第 1 个月）</div>
@@ -435,6 +463,16 @@
   </div>
 </div>
 
+<!-- Supabase client (safe: anon key is public, protected by Row Level Security) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* ============ SUPABASE CONFIG ============
+   填入你的 Supabase 项目地址与 anon key（见文末 README 步骤）。
+   anon key 可以公开提交，安全性由数据库的 Row Level Security 保证。
+   未填写时页面自动以「本地模式」运行（仅 localStorage）。 */
+const SUPABASE_URL = "YOUR_SUPABASE_URL";
+const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
+</script>
 <script>
 /* ============ DATA ============ */
 const CATLABEL={lower:'下肢',upper:'上肢',cardio:'有氧',rest:'休息'};
@@ -727,6 +765,124 @@ document.getElementById('restOver').addEventListener('click',e=>{ if(e.target.id
 document.addEventListener('keydown',e=>{ if(e.key==='Escape') dismissRestOver(); });
 setPreset(todayObj.rest||90);
 renderT();
+
+/* ============ CLOUD SYNC (Supabase + Google) ============ */
+const META='fitkanban_v1_updated';          // 本地最后修改时间戳（ISO）
+let supa=null, supaUser=null, pushTimer=null;
+
+function supaReady(){
+  return window.supabase && SUPABASE_URL && !SUPABASE_URL.includes('YOUR_');
+}
+function setSync(kind){
+  const dot=document.getElementById('sync-dot'), txt=document.getElementById('sync-text');
+  const map={
+    local:['#93a1b3','本地模式'], ready:['#93a1b3','未登录'],
+    pending:['#f59e0b','待同步…'], syncing:['#f59e0b','同步中…'],
+    synced:['#22c55e','已同步'], error:['#ef4444','同步失败'], offline:['#ef4444','离线']
+  };
+  const [c,t]=map[kind]||map.local;
+  if(dot) dot.style.background=c;
+  if(txt) txt.textContent=t;
+}
+function renderAuth(){
+  const loginB=document.getElementById('sync-login');
+  const logoutB=document.getElementById('sync-logout');
+  const userS=document.getElementById('sync-user');
+  if(supaUser){
+    loginB.style.display='none'; logoutB.style.display=''; userS.style.display='';
+    userS.textContent=supaUser.user_metadata?.name||supaUser.email||'已登录';
+  }else{
+    loginB.style.display=''; logoutB.style.display='none'; userS.style.display='none';
+    setSync('ready');
+  }
+}
+/* 把当前 state 同步到复选框 DOM（远端拉取覆盖后调用） */
+function applyStateToDOM(){
+  document.querySelectorAll('.ex').forEach(ex=>{
+    const k=ex.dataset.day, i=+ex.dataset.i, on=isChecked(k,i);
+    const inp=ex.querySelector('input'); if(inp) inp.checked=on;
+    ex.classList.toggle('checked',on);
+  });
+  updateProgress();
+}
+/* 包裹 saveState：本地保存后打时间戳并安排推送 */
+const _saveState=saveState;
+saveState=function(s){
+  _saveState(s);
+  localStorage.setItem(META,new Date().toISOString());
+  schedulePush();
+};
+function schedulePush(){
+  if(!supaUser) return;
+  clearTimeout(pushTimer);
+  setSync('pending');
+  pushTimer=setTimeout(pushNow,700);
+}
+async function pushNow(){
+  if(!supaUser) return;
+  const ts=localStorage.getItem(META)||new Date().toISOString();
+  setSync('syncing');
+  const {error}=await supa.from('workout_state')
+    .upsert({user_id:supaUser.id,state,updated_at:ts});
+  setSync(error?'error':'synced');
+}
+/* 拉取远端并按 updated_at 做「最后写入优先」合并 */
+async function pullAndMerge(){
+  if(!supaUser) return;
+  setSync('syncing');
+  const {data,error}=await supa.from('workout_state')
+    .select('state,updated_at').eq('user_id',supaUser.id).maybeSingle();
+  if(error){ setSync('error'); return; }
+  const localTs=localStorage.getItem(META)||'';
+  const remoteTs=data?.updated_at||'';
+  if(data && remoteTs>localTs){
+    state=data.state||{};
+    _saveState(state);
+    localStorage.setItem(META,remoteTs);
+    applyStateToDOM();
+    setSync('synced');
+  }else if(localTs && (!data || localTs>remoteTs)){
+    await pushNow();          // 本地更新，推到云端
+  }else{
+    setSync('synced');
+  }
+}
+async function loginGoogle(){
+  if(!supa) return;
+  await supa.auth.signInWithOAuth({
+    provider:'google',
+    options:{ redirectTo: location.href.split('#')[0] }
+  });
+}
+async function logout(){
+  if(!supa) return;
+  await supa.auth.signOut();
+  supaUser=null; renderAuth();
+}
+async function initSync(){
+  document.getElementById('sync-logout').onclick=logout;
+  const loginB=document.getElementById('sync-login');
+  if(!supaReady()){
+    setSync('local');
+    loginB.disabled=true; loginB.style.opacity=.55;
+    loginB.title='尚未配置 Supabase，当前为纯本地模式';
+    return;
+  }
+  loginB.onclick=loginGoogle;
+  supa=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+  const {data:{session}}=await supa.auth.getSession();
+  supaUser=session?.user||null;
+  renderAuth();
+  if(supaUser) await pullAndMerge();
+  supa.auth.onAuthStateChange(async (_e,sess)=>{
+    supaUser=sess?.user||null;
+    renderAuth();
+    if(supaUser) await pullAndMerge();
+  });
+  // 回到页面时重新拉取，保持多设备一致
+  window.addEventListener('focus',()=>{ if(supaUser) pullAndMerge(); });
+}
+initSync();
 </script>
 </body>
 </html>
