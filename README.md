@@ -73,9 +73,9 @@ git push -u origin main
 
 ---
 
-## 云同步（可选）：Supabase + Google 登录
+## 云同步（可选）：Supabase + 邮箱魔法链接登录
 
-配置后，用 Google 账号登录即可在手机、电脑之间自动同步打卡记录。**未配置时页面照常以「本地模式」运行，不受影响。**
+配置后，输入邮箱收一封登录邮件、点链接即可登录，之后在手机、电脑之间自动同步打卡记录。**未配置时页面照常以「本地模式」运行，不受影响。**
 
 原理：打卡数据仍先写本地（离线可用），登录后按 `updated_at` 时间戳与云端做「最后写入优先」的双向同步。`anon key` 是公开可提交的，安全性由数据库 Row Level Security（RLS）保证——每个用户只能读写自己那一行。
 
@@ -103,14 +103,13 @@ create policy "own row update" on public.workout_state
   for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
 ```
 
-### 3. 配置 Google 登录
-1. 到 [Google Cloud Console](https://console.cloud.google.com/) → 新建项目 → **APIs & Services → Credentials → Create Credentials → OAuth client ID**（类型选 **Web application**）
-2. 在 **Authorized redirect URIs** 填入 Supabase 的回调地址：
-   `https://<你的项目>.supabase.co/auth/v1/callback`
-3. 拿到 **Client ID / Client Secret**，填到 Supabase → **Authentication → Providers → Google**，启用并保存
-4. Supabase → **Authentication → URL Configuration**：
+### 3. 开启邮箱登录 + 配置回调网址
+1. Supabase → **Authentication → Providers → Email**：确认 **Email** 已启用（默认开启）。
+   - 如果只想用魔法链接、不想设密码，可关闭 “Confirm password” / 打开 “Email OTP”，保持默认即可。
+2. Supabase → **Authentication → URL Configuration**：
    - **Site URL** 填：`https://<用户名>.github.io/<仓库名>/`
    - **Redirect URLs** 里也加上同一个网址
+3. （免费项目默认用 Supabase 内置邮件服务，有每小时发信限额，个人使用够用；量大可在 **Authentication → Emails** 里配置自有 SMTP。）
 
 ### 4. 把密钥填进网页
 编辑 `index.html`，找到顶部的 `SUPABASE CONFIG`，替换两行：
@@ -120,9 +119,10 @@ const SUPABASE_URL = "https://xxxx.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGci...";   // anon public key
 ```
 
-保存后 `git push`，Actions 自动重新部署。刷新网页顶部会出现「用 Google 登录同步」按钮。
+保存后 `git push`，Actions 自动重新部署。刷新网页顶部会出现邮箱输入框 +「发送登录链接」按钮。
 
 ### 常见问题
-- **点登录后跳回来没登上**：多半是第 3 步的 Site URL / Redirect URLs 没填对，或没带结尾斜杠。
+- **没收到登录邮件**：查垃圾邮件箱；确认第 3 步 Email provider 已启用；免费项目内置邮件有发信限额，稍等再试。
+- **点邮件链接跳回来没登上**：多半是第 3 步的 Site URL / Redirect URLs 没填对，或没带结尾斜杠。
 - **登录后记录没同步**：确认第 2 步 SQL 跑成功、RLS 策略已建。
 - **本地模式（灰点）**：说明 `index.html` 里还留着 `YOUR_...` 占位符，未配置云同步。

@@ -283,6 +283,37 @@
     .col{flex-basis:124px}
     .info-pill{font-size:12px;padding:6px 10px}
   }
+  /* ---------- Check-in calendar ---------- */
+  .cal-wrap{display:grid;grid-template-columns:1.15fr .85fr;gap:14px;align-items:start}
+  .cal-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px}
+  .cal-top{display:flex;align-items:center;margin-bottom:12px}
+  .cal-title{font-weight:800;font-size:16px}
+  .cal-nav{margin-left:auto;display:flex;gap:6px}
+  .cal-nav button{min-width:30px;height:30px;padding:0 8px;border-radius:8px;border:1px solid var(--line);background:var(--bg-soft);color:var(--muted);font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;transition:.12s;line-height:1}
+  .cal-nav button:hover{color:var(--text);border-color:var(--faint)}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+  .cal-wd{text-align:center;font-size:11px;color:var(--faint);font-weight:700;padding:2px 0 4px}
+  .cal-day{position:relative;min-height:46px;border-radius:10px;background:var(--bg-soft);border:1px solid transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+  .cal-day .dnum{font-size:12.5px;font-weight:700;color:var(--muted);line-height:1}
+  .cal-day .dsub{font-size:10px;font-weight:800;line-height:1}
+  .cal-day.blank{background:transparent}
+  .cal-day.future{opacity:.32}
+  .cal-day.full{background:rgba(34,197,94,.16);border-color:rgba(34,197,94,.45)}
+  .cal-day.full .dnum{color:var(--text)}
+  .cal-day.full .dsub{color:var(--accent)}
+  .cal-day.partial{background:rgba(245,158,11,.13);border-color:rgba(245,158,11,.4)}
+  .cal-day.partial .dnum{color:var(--text)}
+  .cal-day.partial .dsub{color:var(--today)}
+  .cal-day.restday .dsub{font-size:11px;opacity:.7}
+  .cal-day.today{box-shadow:0 0 0 2px var(--today)}
+  .cal-legend{display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:12px;font-size:11.5px;color:var(--muted)}
+  .cal-legend span{display:inline-flex;align-items:center;gap:6px}
+  .cal-legend .lg{width:11px;height:11px;border-radius:4px;display:inline-block;background:var(--bg-soft);border:1px solid var(--line);flex:none}
+  .cal-legend .lg.full{background:rgba(34,197,94,.35);border-color:var(--accent)}
+  .cal-legend .lg.partial{background:rgba(245,158,11,.3);border-color:var(--today)}
+  .cal-legend .lg.todaylg{background:transparent;border:2px solid var(--today)}
+  @media (max-width:900px){.cal-wrap{grid-template-columns:1fr}}
+
   /* ===== cloud sync bar ===== */
   .syncbar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;
     background:var(--card);border:1px solid var(--line);border-radius:12px;
@@ -296,8 +327,12 @@
     display:inline-flex;align-items:center;gap:7px}
   .sync-btn:hover{background:rgba(255,255,255,.11)}
   .sync-btn:disabled{cursor:default;opacity:.55}
-  .sync-btn.google{background:#fff;color:#1f1f1f;border-color:#fff}
-  .sync-btn.google:hover{filter:brightness(.94)}
+  .sync-btn.google{background:var(--today);color:#1a1205;border-color:var(--today)}
+  .sync-btn.google:hover{filter:brightness(1.06)}
+  .sync-login-form{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+  .sync-input{background:var(--bg-soft);border:1px solid var(--line);color:var(--text);font-family:inherit;font-size:13px;border-radius:9px;padding:7px 11px;width:190px;max-width:52vw}
+  .sync-input::placeholder{color:var(--faint)}
+  .sync-input:focus{outline:none;border-color:var(--today)}
 </style>
 </head>
 <body>
@@ -309,10 +344,10 @@
     <span id="sync-text">本地模式</span>
     <span class="sync-spacer"></span>
     <span class="sync-user" id="sync-user" style="display:none"></span>
-    <button class="sync-btn google" id="sync-login">
-      <svg width="15" height="15" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-      用 Google 登录同步
-    </button>
+    <form class="sync-login-form" id="sync-login-form">
+      <input type="email" id="sync-email" class="sync-input" placeholder="邮箱，用于登录同步" autocomplete="email" required>
+      <button type="submit" class="sync-btn google" id="sync-login">发送登录链接</button>
+    </form>
     <button class="sync-btn" id="sync-logout" style="display:none">退出</button>
   </div>
 
@@ -365,6 +400,41 @@
   <section>
     <div class="sec-head"><h3>每日动作详情</h3><span>勾选打卡 · 点 ▶ 教程 看 YouTube 视频 · 进度自动保存</span><div class="sec-line"></div></div>
     <div class="days" id="days"></div>
+  </section>
+
+  <!-- CHECK-IN CALENDAR -->
+  <section>
+    <div class="sec-head"><h3>打卡日历</h3><span>历史每日完成记录 · 登录后随账号云同步</span><div class="sec-line"></div></div>
+    <div class="cal-wrap">
+      <div class="cal-card">
+        <div class="cal-top">
+          <div class="cal-title" id="cal-label"></div>
+          <div class="cal-nav">
+            <button id="cal-prev" title="上个月">‹</button>
+            <button id="cal-cur" title="回到本月">本月</button>
+            <button id="cal-next" title="下个月">›</button>
+          </div>
+        </div>
+        <div class="cal-grid" id="cal-grid"></div>
+        <div class="cal-legend">
+          <span><i class="lg full"></i>全部完成</span>
+          <span><i class="lg partial"></i>部分完成</span>
+          <span><i class="lg"></i>未打卡</span>
+          <span><i class="lg todaylg"></i>今日</span>
+        </div>
+      </div>
+      <div class="card">
+        <h4>📈 打卡统计</h4>
+        <div class="sub">按每日勾选记录自动统计</div>
+        <div class="grid" style="grid-template-columns:repeat(2,1fr)">
+          <div class="stat"><div class="n amber" id="st-streak">0</div><div class="l">🔥 连续打卡（天）</div></div>
+          <div class="stat"><div class="n green" id="st-month">0</div><div class="l">本月全部完成（天）</div></div>
+          <div class="stat"><div class="n blue" id="st-total">0</div><div class="l">累计全部完成（天）</div></div>
+          <div class="stat"><div class="n teal" id="st-active">0</div><div class="l">累计训练（天）</div></div>
+        </div>
+        <div class="callout" style="margin-top:12px">当天所有动作都勾选即算「全部完成」；周日休息日不打卡也不会中断连续记录。</div>
+      </div>
+    </div>
   </section>
 
   <!-- DIET -->
@@ -650,6 +720,7 @@ function onCheck(dayKey,i,el){
   setChecked(dayKey,i,el.checked);
   el.closest('.ex').classList.toggle('checked',el.checked);
   updateProgress();
+  if(typeof renderCalendar==='function') renderCalendar();
 }
 function resetDay(dayKey){
   state[dayKey]={};saveState(state);
@@ -657,6 +728,7 @@ function resetDay(dayKey){
     const c=ex.querySelector('input');c.checked=false;ex.classList.remove('checked');
   });
   updateProgress();
+  if(typeof renderCalendar==='function') renderCalendar();
 }
 function updateProgress(){
   DAYS.forEach(d=>{
@@ -697,6 +769,76 @@ function centerTodayInKanban(){
 requestAnimationFrame(centerTodayInKanban);
 window.addEventListener('orientationchange',()=>setTimeout(centerTodayInKanban,250));
 window.addEventListener('resize',()=>{clearTimeout(window.__rz);window.__rz=setTimeout(centerTodayInKanban,250);});
+
+/* ============ CHECK-IN CALENDAR ============ */
+let calY=now.getFullYear(), calM=now.getMonth();
+function planFor(d){return DAYS.find(x=>x.dow===d.getDay());}
+function dayDoneCount(k,total){
+  const r=state[k]; if(!r) return 0;
+  let n=0; for(let i=0;i<total;i++) if(r[i]) n++;
+  return n;
+}
+function isDayFull(d){
+  const total=planFor(d).ex.length;
+  return total>0 && dayDoneCount(dateKey(d),total)===total;
+}
+function renderCalendar(){
+  const grid=document.getElementById('cal-grid');
+  if(!grid) return;
+  document.getElementById('cal-label').textContent=calY+'年'+(calM+1)+'月';
+  const lead=(new Date(calY,calM,1).getDay()+6)%7;   // 周一为第一列
+  const dim=new Date(calY,calM+1,0).getDate();
+  const today0=new Date(now); today0.setHours(0,0,0,0);
+  let html=['一','二','三','四','五','六','日'].map(w=>`<div class="cal-wd">${w}</div>`).join('');
+  for(let i=0;i<lead;i++) html+='<div class="cal-day blank"></div>';
+  for(let day=1;day<=dim;day++){
+    const d=new Date(calY,calM,day);
+    const plan=planFor(d), total=plan.ex.length;
+    const done=dayDoneCount(dateKey(d),total);
+    const isFuture=d>today0;
+    let cls='cal-day', sub='';
+    if(isFuture) cls+=' future';
+    else if(done===total&&total>0){cls+=' full';sub='✓';}
+    else if(done>0){cls+=' partial';sub=done+'/'+total;}
+    else if(plan.cat==='rest'){cls+=' restday';sub='😴';}
+    if(d.getTime()===today0.getTime()) cls+=' today';
+    html+=`<div class="${cls}" title="${dateKey(d)} · ${plan.name} · 完成 ${done}/${total}">
+      <span class="dnum">${day}</span>${sub?`<span class="dsub">${sub}</span>`:''}</div>`;
+  }
+  grid.innerHTML=html;
+  renderCalStats();
+}
+function renderCalStats(){
+  // 连续打卡：从今天往回数；休息日未勾选不加也不断
+  let streak=0;
+  const d=new Date(now); d.setHours(0,0,0,0);
+  if(isDayFull(d)) streak++;
+  d.setDate(d.getDate()-1);
+  for(let i=0;i<3650;i++){
+    if(isDayFull(d)) streak++;
+    else if(planFor(d).cat!=='rest') break;
+    d.setDate(d.getDate()-1);
+  }
+  // 累计 / 本月：遍历所有已有记录
+  let total=0, active=0, month=0;
+  const ym=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+  for(const k in state){
+    const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(k); if(!m) continue;
+    const dd=new Date(+m[1],+m[2]-1,+m[3]);
+    const t=planFor(dd).ex.length;
+    const n=dayDoneCount(k,t);
+    if(n>0) active++;
+    if(t>0&&n===t){ total++; if(k.startsWith(ym)) month++; }
+  }
+  document.getElementById('st-streak').textContent=streak;
+  document.getElementById('st-month').textContent=month;
+  document.getElementById('st-total').textContent=total;
+  document.getElementById('st-active').textContent=active;
+}
+document.getElementById('cal-prev').onclick=()=>{calM--;if(calM<0){calM=11;calY--;}renderCalendar();};
+document.getElementById('cal-next').onclick=()=>{calM++;if(calM>11){calM=0;calY++;}renderCalendar();};
+document.getElementById('cal-cur').onclick=()=>{calY=now.getFullYear();calM=now.getMonth();renderCalendar();};
+renderCalendar();
 
 /* ============ REST TIMER ============ */
 let tSec=90,tRemain=90,tRun=false,tInt=null;
@@ -785,7 +927,7 @@ function setSync(kind){
   if(txt) txt.textContent=t;
 }
 function renderAuth(){
-  const loginB=document.getElementById('sync-login');
+  const loginB=document.getElementById('sync-login-form');
   const logoutB=document.getElementById('sync-logout');
   const userS=document.getElementById('sync-user');
   if(supaUser){
@@ -804,6 +946,7 @@ function applyStateToDOM(){
     ex.classList.toggle('checked',on);
   });
   updateProgress();
+  renderCalendar();
 }
 /* 包裹 saveState：本地保存后打时间戳并安排推送 */
 const _saveState=saveState;
@@ -847,12 +990,19 @@ async function pullAndMerge(){
     setSync('synced');
   }
 }
-async function loginGoogle(){
+async function loginEmail(e){
+  if(e&&e.preventDefault) e.preventDefault();
   if(!supa) return;
-  await supa.auth.signInWithOAuth({
-    provider:'google',
-    options:{ redirectTo: location.href.split('#')[0] }
+  const email=(document.getElementById('sync-email').value||'').trim();
+  if(!email) return;
+  setSync('syncing');
+  const {error}=await supa.auth.signInWithOtp({
+    email,
+    options:{ emailRedirectTo: location.href.split('#')[0] }
   });
+  const dot=document.getElementById('sync-dot'), txt=document.getElementById('sync-text');
+  if(error){ setSync('error'); if(txt) txt.textContent='发送失败：'+error.message; }
+  else{ if(dot) dot.style.background='#22c55e'; if(txt) txt.textContent='登录链接已发到邮箱，请查收后点击'; }
 }
 async function logout(){
   if(!supa) return;
@@ -864,11 +1014,11 @@ async function initSync(){
   const loginB=document.getElementById('sync-login');
   if(!supaReady()){
     setSync('local');
-    loginB.disabled=true; loginB.style.opacity=.55;
+    loginB.disabled=true; loginB.style.opacity=.55; document.getElementById('sync-email').disabled=true;
     loginB.title='尚未配置 Supabase，当前为纯本地模式';
     return;
   }
-  loginB.onclick=loginGoogle;
+  document.getElementById('sync-login-form').onsubmit=loginEmail;
   supa=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
   const {data:{session}}=await supa.auth.getSession();
   supaUser=session?.user||null;
