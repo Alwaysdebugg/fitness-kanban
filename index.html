@@ -227,6 +227,48 @@
   .ro-btn:active{transform:scale(.98)}
   .ro-hint{margin-top:13px;font-size:11.5px;color:var(--faint)}
 
+  /* ---------- 热量盈亏 ---------- */
+  .cal-field{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px dashed var(--line)}
+  .cal-field label{font-size:13.5px;color:var(--muted)}
+  .cal-field input,.cal-field select{background:var(--bg-soft);border:1px solid var(--line);color:var(--text);border-radius:8px;padding:8px 9px;font-size:13.5px;font-family:inherit;width:120px;text-align:right}
+  .cal-field select{width:158px;text-align:left}
+  .cal-readout{margin-top:13px;display:flex;gap:8px;flex-wrap:wrap}
+  .cal-pill{flex:1;min-width:88px;background:var(--bg-soft);border:1px solid var(--line);border-radius:11px;padding:10px;text-align:center}
+  .cal-pill .v{font-size:18px;font-weight:800;letter-spacing:-.01em}
+  .cal-pill .k{font-size:11px;color:var(--faint);margin-top:2px}
+  .cal-balance-card{display:flex;flex-direction:column}
+  .cal-big{font-size:38px;font-weight:800;letter-spacing:-.02em;line-height:1.1;margin-top:8px}
+  .cal-tag{display:inline-block;font-size:12.5px;font-weight:700;padding:4px 11px;border-radius:99px;margin-top:9px}
+  .cal-bar-wrap{margin-top:14px}
+  .cal-bar-row{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:5px}
+  .cal-bar-row b{color:var(--text);font-weight:700}
+  .cal-bar{height:9px;border-radius:99px;background:var(--bg-soft);overflow:hidden;position:relative}
+  .cal-bar>span{position:absolute;left:0;top:0;bottom:0;border-radius:99px;transition:width .35s,background .3s}
+  .cal-avg{margin-top:auto;padding-top:13px;font-size:12.5px;color:var(--muted)}
+  .cal-avg b{color:var(--text)}
+  .cal-presets{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .cal-chip{background:var(--bg-soft);border:1px solid var(--line);border-radius:10px;padding:9px 12px;cursor:pointer;font-family:inherit;font-size:13px;color:var(--text);font-weight:700;transition:.15s}
+  .cal-chip:hover{border-color:var(--accent);background:rgba(34,197,94,.1);transform:translateY(-1px)}
+  .cal-chip b{color:var(--faint);font-weight:600;font-size:11.5px;margin-left:5px}
+  .cal-free{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .cal-free input{background:var(--bg-soft);border:1px solid var(--line);color:var(--text);border-radius:9px;padding:9px 10px;font-size:13.5px;font-family:inherit}
+  .cal-free .cf-n{flex:2;min-width:130px}
+  .cal-free .cf-k,.cal-free .cf-p{flex:1;min-width:66px;width:66px;text-align:right}
+  .cal-add{background:var(--accent);color:#04140a;border:0;border-radius:9px;padding:0 18px;font-weight:800;cursor:pointer;font-family:inherit;font-size:13.5px}
+  .cal-add:hover{filter:brightness(1.08)}
+  .cal-log{margin-top:14px}
+  .cal-log-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(43,53,67,.6);font-size:13.5px}
+  .cal-log-item:last-child{border-bottom:0}
+  .cal-log-item .nm{flex:1;font-weight:600}
+  .cal-log-item .mk{color:var(--muted);font-size:12.5px;white-space:nowrap}
+  .cal-log-item .rm{background:none;border:0;color:var(--faint);cursor:pointer;font-size:18px;line-height:1;padding:2px 6px}
+  .cal-log-item .rm:hover{color:#ff6b6b}
+  .cal-empty{color:var(--faint);font-size:13px;padding:14px 0;text-align:center}
+  .cal-log-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid var(--line);font-size:13.5px}
+  .cal-log-foot b{color:var(--text)}
+  .cal-clear{background:none;border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:7px 13px;cursor:pointer;font-family:inherit;font-size:12px;transition:.15s}
+  .cal-clear:hover{color:#ff6b6b;border-color:rgba(255,107,107,.4)}
+
   footer{margin-top:44px;text-align:center;color:var(--faint);font-size:12.5px;line-height:1.8}
 
   /* ===== 平板 ===== */
@@ -447,6 +489,12 @@
       <div class="stat"><div class="n teal">60–70 g</div><div class="l">脂肪</div></div>
     </div>
     <div class="grid g-2" id="meals"></div>
+  </section>
+
+  <!-- CALORIE BALANCE -->
+  <section id="cal">
+    <div class="sec-head"><h3>热量盈亏</h3><span>摄入 − 消耗(TDEE) · 随账号云同步</span><div class="sec-line"></div></div>
+    <div id="calBody"></div>
   </section>
 
   <!-- PROGRESSION -->
@@ -947,6 +995,7 @@ function applyStateToDOM(){
   });
   updateProgress();
   renderCalendar();
+  if(window.refreshCalorie) window.refreshCalorie();   // 云端拉取后刷新热量盈亏
 }
 /* 包裹 saveState：本地保存后打时间戳并安排推送 */
 const _saveState=saveState;
@@ -1033,6 +1082,145 @@ async function initSync(){
   window.addEventListener('focus',()=>{ if(supaUser) pullAndMerge(); });
 }
 initSync();
+
+/* ============ 热量盈亏（数据存入 state.__cal，随云端一起同步） ============ */
+(function(){
+  const root=document.getElementById('calBody');
+  if(!root) return;
+  const PRESETS=[
+    {n:'早餐',kcal:780,p:42},{n:'午餐',kcal:680,p:60},{n:'下午加餐',kcal:450,p:30},
+    {n:'晚餐',kcal:700,p:46},{n:'睡前',kcal:180,p:12}
+  ];
+  const ACTS=[
+    {v:1.2,t:'久坐 · 几乎不动'},{v:1.375,t:'轻度 · 每周 1–3 练'},
+    {v:1.55,t:'中度 · 每周 4–5 练'},{v:1.725,t:'高度 · 几乎每天练'}
+  ];
+  const DEF={w:64.4,h:180,age:25,act:1.55,surplus:400,ov:''};
+
+  // 复用打卡的同步 state：热量数据放在 __cal 命名空间（日期正则不匹配，不影响打卡逻辑）
+  function cal(){
+    if(!state.__cal||typeof state.__cal!=='object') state.__cal={};
+    if(!state.__cal.profile||typeof state.__cal.profile!=='object') state.__cal.profile={};
+    if(!state.__cal.days||typeof state.__cal.days!=='object') state.__cal.days={};
+    for(const k in DEF) if(state.__cal.profile[k]===undefined) state.__cal.profile[k]=DEF[k];
+    return state.__cal;
+  }
+  function persist(){ saveState(state); }   // 沿用你的 saveState：本地保存 + 时间戳 + schedulePush
+
+  function dkey(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+  const cNow=new Date(), tKey=dkey(cNow);
+  function items(k){ const c=cal(); if(!c.days[k]) c.days[k]=[]; return c.days[k]; }
+  function sumOf(k){ return items(k).reduce((a,x)=>({kcal:a.kcal+(+x.kcal||0),p:a.p+(+x.p||0)}),{kcal:0,p:0}); }
+  function bmr(p){return 10*(+p.w||0)+6.25*(+p.h||0)-5*(+p.age||0)+5;}
+  function tdeeOf(p){ if(p.ov&&+p.ov>0) return Math.round(+p.ov); const b=bmr(p); return b>0?Math.round(b*(+p.act||1.55)):0; }
+  function esc(s){ return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+  function color(bal,S){ if(bal<0) return '#ef4444'; if(bal<S) return '#f59e0b'; return '#22c55e'; }
+
+  const P=cal().profile;
+  root.innerHTML=`
+    <div class="grid g-2">
+      <div class="card">
+        <h4>⚙️ 维持热量与目标</h4>
+        <div class="cal-field"><label>体重 (kg)</label><input id="ci-w" type="number" step="0.1" value="${P.w}"></div>
+        <div class="cal-field"><label>身高 (cm)</label><input id="ci-h" type="number" value="${P.h}"></div>
+        <div class="cal-field"><label>年龄</label><input id="ci-age" type="number" value="${P.age}"></div>
+        <div class="cal-field"><label>活动量</label><select id="ci-act">${ACTS.map(a=>`<option value="${a.v}" ${(+P.act===a.v)?'selected':''}>${a.t}</option>`).join('')}</select></div>
+        <div class="cal-field"><label>增肌目标盈余 (kcal)</label><input id="ci-surplus" type="number" step="50" value="${P.surplus}"></div>
+        <div class="cal-field"><label>手动覆盖 TDEE <span style="color:var(--faint)">(可留空)</span></label><input id="ci-ov" type="number" placeholder="用公式" value="${P.ov}"></div>
+        <div class="cal-readout">
+          <div class="cal-pill"><div class="v" id="cr-bmr">–</div><div class="k">BMR 基础代谢</div></div>
+          <div class="cal-pill"><div class="v" id="cr-tdee">–</div><div class="k">TDEE 维持</div></div>
+          <div class="cal-pill"><div class="v" id="cr-target">–</div><div class="k">目标摄入</div></div>
+        </div>
+      </div>
+      <div class="card cal-balance-card">
+        <h4>📊 今日盈亏</h4>
+        <div class="cal-big" id="cb-big">–</div>
+        <div><span class="cal-tag" id="cb-tag">–</span></div>
+        <div class="cal-bar-wrap">
+          <div class="cal-bar-row"><span>摄入 <b id="cb-in">0</b> / 目标 <b id="cb-tg">0</b></span><span id="cb-inpct">0%</span></div>
+          <div class="cal-bar"><span id="cb-inbar" style="width:0%;background:var(--today)"></span></div>
+        </div>
+        <div class="cal-bar-wrap">
+          <div class="cal-bar-row"><span>蛋白质 <b id="cb-p">0</b>g / 目标 120–140g</span><span id="cb-ppct">0%</span></div>
+          <div class="cal-bar"><span id="cb-pbar" style="width:0%;background:var(--accent)"></span></div>
+        </div>
+        <div class="cal-avg" id="cb-avg">近 7 天平均盈亏：<b>–</b></div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:14px">
+      <h4>🍽️ 今日摄入 <span style="color:var(--faint);font-size:12px;font-weight:500">· 点预设餐一键添加，或手动补充</span></h4>
+      <div class="cal-presets" id="cal-presets"></div>
+      <div class="cal-free">
+        <input class="cf-n" id="cf-n" placeholder="食物名称（如：加餐鸡蛋）">
+        <input class="cf-k" id="cf-k" type="number" placeholder="kcal">
+        <input class="cf-p" id="cf-p" type="number" placeholder="蛋白g">
+        <button class="cal-add" id="cf-add">添加</button>
+      </div>
+      <div class="cal-log" id="cal-log"></div>
+      <div class="cal-log-foot"><span>合计 <b id="cl-tot">0</b> kcal · 蛋白 <b id="cl-totp">0</b> g</span><button class="cal-clear" id="cal-clear">清空今日</button></div>
+    </div>`;
+
+  const q=s=>root.querySelector(s);
+  const presetsEl=q('#cal-presets');
+  PRESETS.forEach(m=>{
+    const b=document.createElement('button');
+    b.className='cal-chip';
+    b.innerHTML=esc(m.n)+'<b>+'+m.kcal+' kcal</b>';
+    b.addEventListener('click',()=>{ items(tKey).push({n:m.n,kcal:m.kcal,p:m.p}); persist(); render(); });
+    presetsEl.appendChild(b);
+  });
+  function bind(id,key,ev){ const el=q(id); el.addEventListener(ev||'input',()=>{ cal().profile[key]=el.value; persist(); render(); }); }
+  bind('#ci-w','w'); bind('#ci-h','h'); bind('#ci-age','age'); bind('#ci-act','act','change'); bind('#ci-surplus','surplus'); bind('#ci-ov','ov');
+  function addFree(){
+    const n=q('#cf-n').value.trim()||'自定义';
+    const k=+q('#cf-k').value, p=+q('#cf-p').value||0;
+    if(!k||k<=0){ q('#cf-k').focus(); return; }
+    items(tKey).push({n:n,kcal:k,p:p}); persist();
+    q('#cf-n').value=''; q('#cf-k').value=''; q('#cf-p').value=''; render();
+  }
+  q('#cf-add').addEventListener('click',addFree);
+  q('#cf-k').addEventListener('keydown',e=>{if(e.key==='Enter')addFree();});
+  q('#cf-p').addEventListener('keydown',e=>{if(e.key==='Enter')addFree();});
+  q('#cal-clear').addEventListener('click',()=>{ if(items(tKey).length){ cal().days[tKey]=[]; persist(); render(); } });
+
+  function syncInputs(){ const p=cal().profile; q('#ci-w').value=p.w; q('#ci-h').value=p.h; q('#ci-age').value=p.age; q('#ci-act').value=p.act; q('#ci-surplus').value=p.surplus; q('#ci-ov').value=p.ov; }
+  function render(){
+    const p=cal().profile;
+    const B=Math.round(bmr(p)), T=tdeeOf(p), S=+p.surplus||0, target=T+S;
+    q('#cr-bmr').textContent=B>0?B:'–';
+    q('#cr-tdee').textContent=T>0?T:'–';
+    q('#cr-target').textContent=target>0?target:'–';
+    const s=sumOf(tKey), bal=s.kcal-T;
+    const big=q('#cb-big'), tag=q('#cb-tag');
+    if(s.kcal<=0){
+      big.textContent='—'; big.style.color='var(--faint)';
+      tag.textContent='今天还没记录 · 先添加摄入'; tag.style.color='var(--muted)'; tag.style.background='var(--bg-soft)';
+    } else {
+      big.textContent=(bal>0?'+':'')+bal+' kcal'; big.style.color=color(bal,S);
+      tag.textContent = bal<0 ? '赤字 · 会掉秤' : (bal<S ? '盈余偏小 · 离目标还差 '+(S-bal) : '达标 · 增肌区间 💪');
+      tag.style.color=color(bal,S);
+      tag.style.background = bal<0?'rgba(239,68,68,.14)':(bal<S?'rgba(245,158,11,.14)':'rgba(34,197,94,.14)');
+    }
+    const inpct=target>0?Math.min(100,Math.round(s.kcal/target*100)):0;
+    q('#cb-in').textContent=s.kcal; q('#cb-tg').textContent=target; q('#cb-inpct').textContent=inpct+'%';
+    q('#cb-inbar').style.width=inpct+'%'; q('#cb-inbar').style.background=s.kcal>0?color(bal,S):'var(--today)';
+    const ppct=Math.min(100,Math.round(s.p/130*100));
+    q('#cb-p').textContent=s.p; q('#cb-ppct').textContent=ppct+'%';
+    q('#cb-pbar').style.width=ppct+'%'; q('#cb-pbar').style.background=s.p>=120?'var(--accent)':'var(--upper)';
+    let tot=0,cnt=0;
+    for(let i=0;i<7;i++){ const d=new Date(cNow); d.setDate(cNow.getDate()-i); const k=dkey(d); const c=cal(); if(c.days[k]&&c.days[k].length){ tot+=sumOf(k).kcal-T; cnt++; } }
+    const avg=cnt?Math.round(tot/cnt):0;
+    q('#cb-avg').innerHTML = cnt ? `近 ${cnt} 天平均盈亏：<b style="color:${color(avg,S)}">${(avg>0?'+':'')}${avg} kcal/天</b>` : '近 7 天平均盈亏：<b>暂无记录</b>';
+    const log=q('#cal-log'), arr=items(tKey);
+    if(!arr.length){ log.innerHTML='<div class="cal-empty">还没记录 · 点上面预设餐或手动添加</div>'; }
+    else { log.innerHTML=arr.map((x,i)=>`<div class="cal-log-item"><span class="nm">${esc(x.n)}</span><span class="mk">${x.kcal} kcal${x.p?' · '+x.p+'g 蛋白':''}</span><button class="rm" data-i="${i}" aria-label="删除">×</button></div>`).join(''); }
+    log.querySelectorAll('.rm').forEach(btn=>btn.addEventListener('click',()=>{ items(tKey).splice(+btn.dataset.i,1); persist(); render(); }));
+    q('#cl-tot').textContent=s.kcal; q('#cl-totp').textContent=s.p;
+  }
+  window.refreshCalorie=function(){ try{ syncInputs(); render(); }catch(e){} };  // 云端拉取后由 applyStateToDOM 调用
+  render();
+})();
 </script>
 </body>
 </html>
