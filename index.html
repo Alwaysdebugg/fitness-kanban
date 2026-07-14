@@ -375,6 +375,97 @@
   .sync-input{background:var(--bg-soft);border:1px solid var(--line);color:var(--text);font-family:inherit;font-size:13px;border-radius:9px;padding:7px 11px;width:190px;max-width:52vw}
   .sync-input::placeholder{color:var(--faint)}
   .sync-input:focus{outline:none;border-color:var(--today)}
+
+  /* ---------- Monthly workout competition ---------- */
+  .competition-card{
+    position:relative;overflow:hidden;background:
+      radial-gradient(500px 220px at 96% -20%,rgba(59,130,246,.19),transparent 68%),
+      radial-gradient(420px 220px at -8% 115%,rgba(34,197,94,.14),transparent 70%),
+      linear-gradient(145deg,rgba(245,158,11,.08),transparent 54%),var(--card);
+    border:1px solid rgba(245,158,11,.32);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)
+  }
+  .competition-card::after{content:"";position:absolute;right:34%;top:-64px;width:126px;height:126px;border-radius:50%;background:rgba(245,158,11,.055);pointer-events:none}
+  .competition-head{position:relative;z-index:1;display:flex;align-items:flex-start;justify-content:space-between;gap:18px}
+  .competition-kicker{color:var(--today);font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
+  .competition-title{font-size:20px;font-weight:800;letter-spacing:-.01em;margin-top:3px}
+  .competition-copy{color:var(--muted);font-size:13px;margin-top:5px;max-width:610px}
+  .competition-month{flex:none;display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.055);border:1px solid var(--line);border-radius:11px;padding:8px 11px;color:var(--muted);font-size:12px;font-weight:700}
+  .competition-month b{color:var(--text);font-size:14px}
+  .competition-body{position:relative;z-index:1;margin-top:17px}
+  .competition-empty,.competition-loading{
+    min-height:118px;border:1px dashed var(--faint);border-radius:14px;background:rgba(14,17,22,.42);padding:18px;
+    display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:16px
+  }
+  .competition-loading{grid-template-columns:1fr;place-items:center;color:var(--muted);font-size:13px}
+  .competition-empty-art{display:flex;align-items:center;justify-content:center}
+  .competition-empty-art span{width:46px;height:46px;display:grid;place-items:center;border:2px solid var(--line);border-radius:50%;background:var(--card-2);font-size:23px;box-shadow:0 8px 16px rgba(0,0,0,.2)}
+  .competition-empty-art i{width:28px;border-top:2px dotted var(--faint)}
+  .competition-empty-main b{display:block;font-size:14px}
+  .competition-empty-main p{color:var(--muted);font-size:12.5px;margin-top:4px;max-width:520px}
+  .competition-btn{border:0;border-radius:10px;padding:10px 14px;min-height:40px;background:var(--today);color:#1a1205;font-family:inherit;font-size:13px;font-weight:800;cursor:pointer;transition:.15s;white-space:nowrap}
+  .competition-btn:hover{filter:brightness(1.08);transform:translateY(-1px)}
+  .competition-btn:disabled{opacity:.55;cursor:default;transform:none}
+  .competition-btn.secondary{background:rgba(255,255,255,.07);color:var(--text);border:1px solid var(--line)}
+  .competition-race{position:relative;height:182px;border:1px solid var(--line);border-radius:14px;background:rgba(14,17,22,.48);overflow:hidden}
+  .competition-race::before{content:"✦  ·  ✦  ·  ✦";position:absolute;left:50%;top:10px;transform:translateX(-50%);color:rgba(245,158,11,.28);letter-spacing:.55em;font-size:11px;white-space:nowrap}
+  .competition-track{position:absolute;left:7%;right:7%;top:50%;height:8px;transform:translateY(-50%);border:1px solid var(--faint);border-radius:99px;background:repeating-linear-gradient(90deg,var(--line) 0 18px,var(--bg-soft) 18px 36px)}
+  .competition-track::before{content:"";position:absolute;left:-5px;top:50%;width:13px;height:13px;transform:translateY(-50%);border:3px solid var(--card);border-radius:50%;background:var(--accent);box-shadow:0 0 0 1px var(--faint)}
+  .competition-track::after{content:"🏁";position:absolute;right:-14px;top:50%;transform:translateY(-56%);font-size:25px}
+  .competition-gap{position:absolute;z-index:1;top:50%;height:8px;transform:translateY(-50%);border-radius:99px;background:linear-gradient(90deg,var(--today),#fb7185);box-shadow:0 0 0 2px rgba(14,17,22,.8),0 5px 14px rgba(245,158,11,.22)}
+  .competition-gap.opponent{background:linear-gradient(90deg,var(--upper),#8b5cf6)}
+  .competition-gap span{position:absolute;left:50%;top:-31px;min-width:70px;transform:translateX(-50%);background:var(--today);color:#1a1205;border-radius:8px;padding:4px 7px;font-size:10px;font-weight:800;text-align:center;white-space:nowrap}
+  .competition-gap.opponent span{background:var(--upper);color:#061226}
+  .competition-runner{--race-progress:8%;position:absolute;z-index:2;left:var(--race-progress);width:104px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;transition:left .5s cubic-bezier(.2,.8,.2,1)}
+  .competition-runner.me{top:7px}.competition-runner.opponent{bottom:7px}
+  .competition-crown{height:15px;color:var(--today);font-size:14px;line-height:1;margin-bottom:-1px;filter:drop-shadow(0 2px 3px rgba(245,158,11,.3))}
+  .competition-avatar{width:52px;height:52px;display:grid;place-items:center;border:3px solid var(--card-2);border-radius:50%;background:linear-gradient(145deg,rgba(245,158,11,.28),rgba(251,113,133,.2));font-size:25px;box-shadow:0 8px 18px rgba(0,0,0,.28)}
+  .competition-runner.opponent .competition-avatar{background:linear-gradient(145deg,rgba(59,130,246,.3),rgba(139,92,246,.2))}
+  .competition-runner.leading .competition-avatar{box-shadow:0 0 0 2px var(--today),0 8px 18px rgba(0,0,0,.3)}
+  .competition-runner.waiting .competition-avatar{border-style:dashed;opacity:.72}
+  .competition-label{max-width:104px;margin-top:4px;border:1px solid var(--line);border-radius:8px;background:rgba(27,34,44,.92);padding:3px 7px;text-align:center;box-shadow:0 4px 10px rgba(0,0,0,.2)}
+  .competition-label b,.competition-label small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .competition-label b{font-size:11px}.competition-label small{color:var(--muted);font-size:9px;margin-top:1px}
+  .competition-scoreboard{display:grid;grid-template-columns:1fr minmax(108px,.58fr) 1fr;gap:10px;margin-top:12px}
+  .competition-score{min-width:0;background:rgba(14,17,22,.5);border:1px solid var(--line);border-radius:13px;padding:12px 14px}
+  .competition-score.leader{border-color:rgba(245,158,11,.6);background:linear-gradient(145deg,rgba(245,158,11,.12),rgba(14,17,22,.5))}
+  .competition-score .who{display:flex;align-items:center;gap:7px;min-width:0;font-size:12px}
+  .competition-score .who span{width:28px;height:28px;display:grid;place-items:center;border-radius:50%;background:var(--bg-soft);font-size:15px}
+  .competition-score .who b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .competition-score strong{display:block;color:var(--today);font-size:28px;line-height:1;margin-top:7px}.competition-score strong small{font-size:11px}
+  .competition-score p{font-size:10.5px;color:var(--muted);margin:5px 0}
+  .competition-score i{display:block;height:5px;border-radius:99px;overflow:hidden;background:var(--line)}
+  .competition-score i span{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--accent),var(--today))}
+  .competition-gap-card{border-radius:13px;padding:10px;background:linear-gradient(145deg,#25364d,#3b526e);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+  .competition-gap-card.tie{background:linear-gradient(145deg,#7a3f24,#a8592d)}
+  .competition-gap-card small{color:#b6c3d4;font-size:9px;font-weight:800}.competition-gap-card strong{font-size:22px;line-height:1;margin:4px 0}.competition-gap-card span{color:#d6deea;font-size:9px}
+  .competition-foot{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:12px}
+  .competition-motivation{flex:1 1 250px;min-height:44px;border-radius:11px;background:rgba(255,255,255,.045);border:1px solid var(--line);padding:8px 11px;display:flex;align-items:center;gap:8px}
+  .competition-motivation>span:first-child{font-size:19px}.competition-motivation small,.competition-motivation b{display:block}.competition-motivation small{color:var(--muted);font-size:9px}.competition-motivation b{font-size:11.5px;margin-top:1px}
+  .competition-invite{min-height:44px;border:1px solid rgba(245,158,11,.4);border-radius:11px;background:rgba(245,158,11,.08);color:var(--text);padding:6px 10px;display:flex;align-items:center;gap:10px;cursor:pointer;font-family:inherit}
+  .competition-invite small,.competition-invite b{display:block;text-align:left}.competition-invite small{color:var(--muted);font-size:9px}.competition-invite b{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;letter-spacing:.14em;color:var(--today)}
+  .competition-end{border:0;background:none;color:var(--faint);font-family:inherit;font-size:11px;text-decoration:underline;text-underline-offset:3px;padding:8px;cursor:pointer}
+  .competition-end:hover{color:#ff6b6b}
+  .competition-note{color:var(--faint);font-size:10.5px;margin-top:9px}
+
+  /* Competition setup modal */
+  .competition-modal-backdrop{position:fixed;inset:0;z-index:90;display:none;align-items:center;justify-content:center;background:rgba(8,11,15,.78);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);padding:20px}
+  .competition-modal-backdrop.show{display:flex;animation:roFade .18s ease}
+  .competition-modal{width:min(430px,100%);max-height:calc(100vh - 40px);overflow:auto;background:linear-gradient(155deg,rgba(245,158,11,.09),transparent 45%),var(--card-2);border:1px solid var(--line);border-radius:20px;box-shadow:0 28px 80px rgba(0,0,0,.62);padding:20px}
+  .competition-modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.competition-modal-head h3{font-size:20px}.competition-modal-close{width:34px;height:34px;border:1px solid var(--line);border-radius:9px;background:rgba(255,255,255,.04);color:var(--muted);font-size:21px;cursor:pointer}
+  .competition-tabs{display:grid;grid-template-columns:1fr 1fr;gap:5px;background:var(--bg-soft);border-radius:11px;padding:4px;margin:17px 0}
+  .competition-tabs button{min-height:38px;border:0;border-radius:8px;background:transparent;color:var(--muted);font-family:inherit;font-size:12px;font-weight:800;cursor:pointer}.competition-tabs button.active{background:var(--card);color:var(--today);box-shadow:0 4px 10px rgba(0,0,0,.2)}
+  .competition-modal-copy{color:var(--muted);font-size:12px;margin-bottom:13px}
+  .competition-field{display:grid;gap:6px;margin-bottom:14px}.competition-field>span,.competition-avatar-field legend{color:var(--muted);font-size:11px;font-weight:700}.competition-field input{width:100%;background:var(--bg-soft);border:1px solid var(--line);color:var(--text);border-radius:9px;padding:10px 11px;font-family:inherit;font-size:14px}.competition-field input:focus{outline:none;border-color:var(--today)}
+  .competition-avatar-field{border:0;margin:0 0 15px}.competition-avatar-field legend{margin-bottom:7px}.competition-avatar-options{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}.competition-avatar-options button{aspect-ratio:1;border:2px solid transparent;border-radius:10px;background:var(--bg-soft);font-size:21px;cursor:pointer}.competition-avatar-options button:hover,.competition-avatar-options button.active{border-color:var(--today);background:rgba(245,158,11,.1);transform:translateY(-1px)}
+  .competition-invite-field input{text-transform:uppercase;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:18px;letter-spacing:.18em;text-align:center}
+  .competition-form-error{display:none;color:#ff8a8a;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.28);border-radius:9px;padding:8px 10px;font-size:11.5px;margin-bottom:12px}.competition-form-error.show{display:block}
+  .competition-submit{width:100%;min-height:44px}
+
+  @media (max-width:640px){
+    .competition-card{padding:16px 12px}.competition-head{flex-direction:column;gap:10px}.competition-month{width:100%;justify-content:center}.competition-title{font-size:18px}
+    .competition-empty{grid-template-columns:1fr;text-align:center;gap:12px}.competition-empty-main p{margin-left:auto;margin-right:auto}.competition-btn{width:100%;min-height:44px}.competition-race{height:174px}.competition-runner{width:76px}.competition-avatar{width:46px;height:46px;font-size:21px}.competition-label{max-width:76px}.competition-label small{display:none}.competition-gap span{display:none}
+    .competition-scoreboard{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.competition-gap-card{grid-column:1/-1;grid-row:1;min-height:54px;display:grid;grid-template-columns:1fr auto 1fr;gap:8px}.competition-gap-card small{justify-self:end}.competition-gap-card strong{margin:0}.competition-gap-card span{justify-self:start}.competition-score{padding:10px}.competition-score strong{font-size:24px}.competition-foot{align-items:stretch;flex-direction:column}.competition-motivation{flex:0 0 auto}.competition-motivation,.competition-invite{width:100%}.competition-invite{justify-content:space-between}.competition-end{align-self:center;min-height:40px}.competition-avatar-options{grid-template-columns:repeat(3,1fr)}.competition-avatar-options button{min-height:52px;aspect-ratio:auto}
+  }
 </style>
 </head>
 <body>
@@ -431,6 +522,24 @@
       </div>
     </div>
   </div>
+
+  <!-- MONTHLY WORKOUT COMPETITION -->
+  <section id="competition">
+    <div class="sec-head"><h3>运动竞赛</h3><span>和 HER MOVE 共用本月双人赛</span><div class="sec-line"></div></div>
+    <div class="competition-card">
+      <div class="competition-head">
+        <div>
+          <div class="competition-kicker">Monthly workout race</div>
+          <div class="competition-title">和运动搭子比一比本月打卡</div>
+          <div class="competition-copy">同一个邀请码连接两个看板；只同步昵称、头像和完成天数，具体训练内容保持私密。</div>
+        </div>
+        <span class="competition-month" id="competition-month">📅 <b>—</b></span>
+      </div>
+      <div class="competition-body" id="competition-body" aria-live="polite">
+        <div class="competition-loading">正在准备本月赛道…</div>
+      </div>
+    </div>
+  </section>
 
   <!-- WEEKLY KANBAN -->
   <section>
@@ -578,6 +687,38 @@
     <div class="ro-sub">开始下一组 💪</div>
     <button class="ro-btn" onclick="dismissRestOver()">继续训练</button>
     <div class="ro-hint">点击任意处 / 按 Esc 关闭 · 12 秒后自动关闭</div>
+  </div>
+</div>
+
+<!-- 创建 / 加入运动竞赛 -->
+<div class="competition-modal-backdrop" id="competition-modal" role="presentation" aria-hidden="true">
+  <div class="competition-modal" role="dialog" aria-modal="true" aria-labelledby="competition-modal-title">
+    <div class="competition-modal-head">
+      <div><div class="competition-kicker">运动搭子挑战</div><h3 id="competition-modal-title">一起动起来</h3></div>
+      <button class="competition-modal-close" id="competition-modal-close" type="button" aria-label="关闭">×</button>
+    </div>
+    <div class="competition-tabs" role="tablist" aria-label="比赛操作">
+      <button id="competition-tab-create" class="active" type="button" role="tab" aria-selected="true">发起比赛</button>
+      <button id="competition-tab-join" type="button" role="tab" aria-selected="false">加入比赛</button>
+    </div>
+    <form id="competition-form">
+      <p class="competition-modal-copy" id="competition-modal-copy">生成一个 6 位邀请码，和运动搭子比较本月完成的打卡天数。</p>
+      <label class="competition-field"><span>比赛昵称</span><input id="competition-name" maxlength="20" required placeholder="例如：Jacky" autocomplete="nickname"></label>
+      <fieldset class="competition-avatar-field">
+        <legend>选择卡通头像</legend>
+        <div class="competition-avatar-options" id="competition-avatar-options">
+          <button class="active" type="button" data-avatar="🐰" aria-label="选择头像 🐰" aria-pressed="true">🐰</button>
+          <button type="button" data-avatar="🐱" aria-label="选择头像 🐱" aria-pressed="false">🐱</button>
+          <button type="button" data-avatar="🐻" aria-label="选择头像 🐻" aria-pressed="false">🐻</button>
+          <button type="button" data-avatar="🐼" aria-label="选择头像 🐼" aria-pressed="false">🐼</button>
+          <button type="button" data-avatar="🐹" aria-label="选择头像 🐹" aria-pressed="false">🐹</button>
+          <button type="button" data-avatar="🦊" aria-label="选择头像 🦊" aria-pressed="false">🦊</button>
+        </div>
+      </fieldset>
+      <label class="competition-field competition-invite-field" id="competition-invite-field" hidden><span>6 位邀请码</span><input id="competition-code" minlength="6" maxlength="6" inputmode="text" autocomplete="off" placeholder="A8K2QF"></label>
+      <div class="competition-form-error" id="competition-form-error" role="alert"></div>
+      <button class="competition-btn competition-submit" id="competition-submit" type="submit">🏆 创建我的比赛</button>
+    </form>
   </div>
 </div>
 
@@ -769,6 +910,7 @@ function onCheck(dayKey,i,el){
   el.closest('.ex').classList.toggle('checked',el.checked);
   updateProgress();
   if(typeof renderCalendar==='function') renderCalendar();
+  scheduleCompetitionDaySync(dayKey);
 }
 function resetDay(dayKey){
   state[dayKey]={};saveState(state);
@@ -777,6 +919,7 @@ function resetDay(dayKey){
   });
   updateProgress();
   if(typeof renderCalendar==='function') renderCalendar();
+  scheduleCompetitionDaySync(dayKey);
 }
 function updateProgress(){
   DAYS.forEach(d=>{
@@ -959,6 +1102,9 @@ renderT();
 /* ============ CLOUD SYNC (Supabase + Google) ============ */
 const META='fitkanban_v1_updated';          // 本地最后修改时间戳（ISO）
 let supa=null, supaUser=null, pushTimer=null;
+let competition=null,competitionStatus='idle',competitionMessage='',competitionSyncError='';
+let competitionMode='create',competitionAvatar='🐰',competitionSyncTimer=null;
+const pendingCompetitionDays=new Set();
 
 function supaReady(){
   return window.supabase && SUPABASE_URL && !SUPABASE_URL.includes('YOUR_');
@@ -985,7 +1131,215 @@ function renderAuth(){
     loginB.style.display=''; logoutB.style.display='none'; userS.style.display='none';
     setSync('ready');
   }
+  renderCompetition();
 }
+
+/* ============ MONTHLY WORKOUT COMPETITION ============
+   复用 HER MOVE 的 fitness_competitions 表与安全 RPC；本看板仅把“当日全部完成”
+   镜像到 shared daily_logs 的 completed 字段，双方的具体训练内容不会互相读取。 */
+function competitionEsc(value){
+  return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function competitionMonthInfo(){
+  const d=new Date(),days=new Date(d.getFullYear(),d.getMonth()+1,0).getDate();
+  return {label:(d.getMonth()+1)+' 月',days};
+}
+function openCompetitionLogin(){
+  const input=document.getElementById('sync-email');
+  document.getElementById('syncbar').scrollIntoView({behavior:'smooth',block:'center'});
+  setTimeout(()=>input&&input.focus(),350);
+}
+function renderCompetition(){
+  const root=document.getElementById('competition-body'),monthEl=document.getElementById('competition-month');
+  if(!root||!monthEl) return;
+  const month=competitionMonthInfo();
+  monthEl.innerHTML='📅 <b>'+month.label+'</b> · '+month.days+' 天';
+
+  if(!supaReady()){
+    root.innerHTML=`<div class="competition-empty"><div class="competition-empty-art"><span>☁️</span></div><div class="competition-empty-main"><b>比赛功能等待云端配置</b><p>训练打卡仍可在本地使用；配置同一 Supabase 项目后即可连接 HER MOVE。</p></div></div>`;
+    return;
+  }
+  if(!supaUser){
+    root.innerHTML=`<div class="competition-empty"><div class="competition-empty-art" aria-hidden="true"><span>🐻</span><i></i><span>🐰</span></div><div class="competition-empty-main"><b>登录后就能发起本月比赛</b><p>使用邮箱登录后，可创建邀请码或加入 HER MOVE 已创建的比赛。</p></div><button class="competition-btn" type="button" onclick="openCompetitionLogin()">登录并开始</button></div>`;
+    return;
+  }
+  if(competitionStatus==='loading'){
+    root.innerHTML='<div class="competition-loading">✨ 正在查看最新赛况…</div>';
+    return;
+  }
+  if(competitionStatus==='unavailable'){
+    root.innerHTML=`<div class="competition-empty"><div class="competition-empty-art"><span>☁️</span></div><div class="competition-empty-main"><b>${competitionEsc(competitionMessage||'暂时无法读取比赛数据')}</b><p>训练打卡不受影响；确认共享 Supabase 已执行 competition.sql。</p></div><button class="competition-btn secondary" type="button" onclick="loadCompetition()">重新加载</button></div>`;
+    return;
+  }
+  if(!competition){
+    root.innerHTML=`<div class="competition-empty"><div class="competition-empty-art" aria-hidden="true"><span>🐼</span><i></i><span>＋</span></div><div class="competition-empty-main"><b>邀请一位朋友来比本月打卡吧</b><p>每月 1 日自动重新计分；创建邀请码，或输入朋友分享的 6 位邀请码。</p></div><button class="competition-btn" type="button" onclick="openCompetitionModal('create')">创建或加入比赛</button></div>`;
+    return;
+  }
+
+  const c=competition,goal=c.goalDays||month.days;
+  const progress=days=>Math.min(92,Math.max(8,8+(days/goal)*84));
+  const meProgress=progress(c.meDays),opponentProgress=progress(c.opponentDays);
+  const meLeading=!c.waiting&&c.meDays>c.opponentDays;
+  const opponentLeading=!c.waiting&&c.opponentDays>c.meDays;
+  const gap=c.waiting?0:Math.abs(c.meDays-c.opponentDays);
+  const gapStart=Math.min(meProgress,opponentProgress),gapWidth=Math.abs(meProgress-opponentProgress);
+  const meRate=Math.round(c.meDays/goal*100),opponentRate=Math.round(c.opponentDays/goal*100);
+  const meName=competitionEsc(c.meName),opponentName=competitionEsc(c.opponentName||'等待搭子');
+  const action=c.waiting?'完成今天的训练，先为自己抢下起跑优势':gap===0?'今天完成打卡，就能立刻领先 1 天':meLeading?`再完成 1 次，把领先扩大到 ${gap+1} 天`:gap===1?'今天完成打卡，就能追成平局':`今天完成打卡，差距就缩小到 ${gap-1} 天`;
+  const raceSummary=c.waiting?'路线已经铺好，分享邀请码等待搭子加入':gap===0?'本月暂时平局，下一次打卡决定领先':meLeading?`你暂时领先 ${gap} 天，继续保持`: `${opponentName} 暂时领先 ${gap} 天，快追上来`;
+
+  root.innerHTML=`
+    <div class="competition-race" aria-label="${meName} ${c.meDays} 天，${c.waiting?'等待对手加入':opponentName+' '+c.opponentDays+' 天'}">
+      <div class="competition-track" aria-hidden="true"></div>
+      ${!c.waiting&&gap>0?`<div class="competition-gap ${meLeading?'':'opponent'}" style="left:${gapStart}%;width:${gapWidth}%" aria-hidden="true"><span>${gap} 天差距</span></div>`:''}
+      <div class="competition-runner me ${meLeading?'leading':''}" style="--race-progress:${meProgress}%">
+        <span class="competition-crown">${meLeading?'♛':''}</span><span class="competition-avatar">${competitionEsc(c.meAvatar)}</span><span class="competition-label"><b>${meName}</b><small>本月 ${c.meDays} 天</small></span>
+      </div>
+      <div class="competition-runner opponent ${opponentLeading?'leading':''} ${c.waiting?'waiting':''}" style="--race-progress:${opponentProgress}%">
+        <span class="competition-crown">${opponentLeading?'♛':''}</span><span class="competition-avatar">${c.waiting?'❔':competitionEsc(c.opponentAvatar)}</span><span class="competition-label"><b>${opponentName}</b><small>${c.waiting?'尚未加入':'本月 '+c.opponentDays+' 天'}</small></span>
+      </div>
+    </div>
+    ${c.waiting?'':`<div class="competition-scoreboard">
+      <article class="competition-score ${meLeading?'leader':''}"><div class="who"><span>${competitionEsc(c.meAvatar)}</span><b>${meName}</b></div><strong>${c.meDays}<small> 天</small></strong><p>本月完成率 ${meRate}%</p><i><span style="width:${Math.min(100,meRate)}%"></span></i></article>
+      <div class="competition-gap-card ${gap===0?'tie':''}"><small>${gap===0?'势均力敌':'当前差距'}</small><strong>${gap===0?'平局':gap+'天'}</strong><span>${gap===0?'下一次决定领先':meLeading?'你在领先':'正在追赶'}</span></div>
+      <article class="competition-score ${opponentLeading?'leader':''}"><div class="who"><span>${competitionEsc(c.opponentAvatar)}</span><b>${opponentName}</b></div><strong>${c.opponentDays}<small> 天</small></strong><p>本月完成率 ${opponentRate}%</p><i><span style="width:${Math.min(100,opponentRate)}%"></span></i></article>
+    </div>`}
+    <div class="competition-foot">
+      <div class="competition-motivation"><span>🔥</span><span><small>${competitionEsc(raceSummary)}</small><b>${competitionEsc(action)}</b></span></div>
+      ${c.waiting?`<button class="competition-invite" type="button" onclick="copyCompetitionCode('${competitionEsc(c.inviteCode)}')"><span><small>比赛邀请码 · 点击复制</small><b>${competitionEsc(c.inviteCode)}</b></span><span>⧉</span></button>`:''}
+      <button class="competition-btn" type="button" onclick="scrollToToday()">今天去打卡</button>
+      <button class="competition-end" type="button" onclick="endCompetition()">结束本场</button>
+    </div>
+    <div class="competition-note">${competitionSyncError?competitionEsc(competitionSyncError):'计分规则：当天计划全部勾选后 +1 天；每月自动归零，训练详情不会分享。'}</div>`;
+}
+
+async function loadCompetition(){
+  if(!supa||!supaUser){competition=null;competitionStatus='idle';renderCompetition();return;}
+  competitionStatus='loading';competitionMessage='';renderCompetition();
+  const {data,error}=await supa.rpc('get_my_fitness_competition').maybeSingle();
+  if(error){
+    competition=null;competitionStatus='unavailable';
+    competitionMessage=(error.code==='PGRST202'||String(error.message).includes('get_my_fitness_competition'))?'比赛数据库尚未完成升级':'暂时无法读取比赛数据';
+    renderCompetition();return;
+  }
+  if(!data){competition=null;competitionStatus='ready';renderCompetition();return;}
+  competition={
+    competitionId:String(data.competition_id),inviteCode:String(data.invite_code),startedOn:String(data.started_on),goalDays:Number(data.goal_days),
+    meName:String(data.me_name),meAvatar:String(data.me_avatar),meDays:Number(data.me_days),opponentName:data.opponent_name?String(data.opponent_name):null,
+    opponentAvatar:data.opponent_avatar?String(data.opponent_avatar):null,opponentDays:Number(data.opponent_days),waiting:Boolean(data.waiting)
+  };
+  competitionStatus='ready';renderCompetition();
+}
+
+function setCompetitionMode(mode){
+  competitionMode=mode==='join'?'join':'create';
+  const isJoin=competitionMode==='join';
+  document.getElementById('competition-tab-create').classList.toggle('active',!isJoin);
+  document.getElementById('competition-tab-create').setAttribute('aria-selected',String(!isJoin));
+  document.getElementById('competition-tab-join').classList.toggle('active',isJoin);
+  document.getElementById('competition-tab-join').setAttribute('aria-selected',String(isJoin));
+  document.getElementById('competition-invite-field').hidden=!isJoin;
+  document.getElementById('competition-code').required=isJoin;
+  document.getElementById('competition-modal-copy').textContent=isJoin?'输入朋友发给你的邀请码，加入同一条本月赛道。':'生成一个 6 位邀请码，和运动搭子比较本月完成的打卡天数。';
+  document.getElementById('competition-submit').textContent=isJoin?'👥 加入这场比赛':'🏆 创建我的比赛';
+  setCompetitionFormError('');
+}
+function openCompetitionModal(mode){
+  if(!supaUser){openCompetitionLogin();return;}
+  setCompetitionMode(mode||'create');
+  const saved=localStorage.getItem('fitkanban_competition_name');
+  document.getElementById('competition-name').value=saved||(supaUser.email?supaUser.email.split('@')[0]:'Jacky');
+  const modal=document.getElementById('competition-modal');
+  modal.classList.add('show');modal.setAttribute('aria-hidden','false');
+  document.body.style.overflow='hidden';
+  setTimeout(()=>document.getElementById('competition-name').focus(),30);
+}
+function closeCompetitionModal(){
+  const modal=document.getElementById('competition-modal');
+  modal.classList.remove('show');modal.setAttribute('aria-hidden','true');document.body.style.overflow='';setCompetitionFormError('');
+}
+function setCompetitionFormError(message){
+  const el=document.getElementById('competition-form-error');
+  el.textContent=message||'';el.classList.toggle('show',!!message);
+}
+async function submitCompetitionForm(event){
+  event.preventDefault();
+  const name=document.getElementById('competition-name').value.trim();
+  const code=document.getElementById('competition-code').value.trim().toUpperCase();
+  const button=document.getElementById('competition-submit');
+  if(!name){document.getElementById('competition-name').focus();return;}
+  if(competitionMode==='join'&&!/^[A-Z0-9]{6}$/.test(code)){setCompetitionFormError('请输入有效的 6 位邀请码');return;}
+  button.disabled=true;button.textContent='正在准备赛道…';setCompetitionFormError('');
+  try{
+    const args=competitionMode==='join'?{p_invite_code:code,p_display_name:name,p_avatar:competitionAvatar}:{p_display_name:name,p_avatar:competitionAvatar};
+    const rpc=competitionMode==='join'?'join_fitness_competition':'create_fitness_competition';
+    const {error}=await supa.rpc(rpc,args);
+    if(error) throw error;
+    localStorage.setItem('fitkanban_competition_name',name);
+    closeCompetitionModal();await loadCompetition();
+  }catch(error){setCompetitionFormError(error&&error.message?error.message:'操作失败，请稍后重试');}
+  finally{button.disabled=false;button.textContent=competitionMode==='join'?'👥 加入这场比赛':'🏆 创建我的比赛';}
+}
+async function copyCompetitionCode(code){
+  try{await navigator.clipboard.writeText(code);}catch(e){window.prompt('复制比赛邀请码',code);}
+  const btn=document.querySelector('.competition-invite small');
+  if(btn){const old=btn.textContent;btn.textContent='已复制，发给你的运动搭子';setTimeout(()=>{if(btn.isConnected)btn.textContent=old;},1800);}
+}
+async function endCompetition(){
+  if(!competition||!supa||!confirm('确定结束这场比赛吗？结束后双方都将离开当前赛道。')) return;
+  const {error}=await supa.rpc('end_fitness_competition',{p_competition_id:competition.competitionId});
+  if(error){competitionSyncError='结束比赛失败，请稍后重试';renderCompetition();return;}
+  competition=null;competitionSyncError='';await loadCompetition();
+}
+function initCompetitionModal(){
+  document.getElementById('competition-tab-create').onclick=()=>setCompetitionMode('create');
+  document.getElementById('competition-tab-join').onclick=()=>setCompetitionMode('join');
+  document.getElementById('competition-modal-close').onclick=closeCompetitionModal;
+  document.getElementById('competition-modal').addEventListener('mousedown',e=>{if(e.target.id==='competition-modal')closeCompetitionModal();});
+  document.getElementById('competition-form').addEventListener('submit',submitCompetitionForm);
+  document.getElementById('competition-code').addEventListener('input',e=>{e.target.value=e.target.value.replace(/[^a-z0-9]/gi,'').toUpperCase();});
+  document.getElementById('competition-avatar-options').querySelectorAll('button').forEach(btn=>btn.addEventListener('click',()=>{
+    competitionAvatar=btn.dataset.avatar;
+    document.querySelectorAll('#competition-avatar-options button').forEach(item=>{const on=item===btn;item.classList.toggle('active',on);item.setAttribute('aria-pressed',String(on));});
+  }));
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElementById('competition-modal').classList.contains('show'))closeCompetitionModal();});
+}
+
+function scheduleCompetitionDaySync(dayKey){
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(dayKey)||!supaUser) return;
+  pendingCompetitionDays.add(dayKey);clearTimeout(competitionSyncTimer);
+  competitionSyncTimer=setTimeout(flushCompetitionDaySync,550);
+}
+async function flushCompetitionDaySync(){
+  const keys=[...pendingCompetitionDays];pendingCompetitionDays.clear();
+  if(keys.length) await syncCompetitionDays(keys);
+}
+function currentMonthCompetitionKeys(){
+  const d=new Date(),prefix=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-';
+  return Object.keys(state).filter(k=>k.startsWith(prefix)&&/^\d{4}-\d{2}-\d{2}$/.test(k));
+}
+async function syncCompetitionDays(dayKeys){
+  if(!supa||!supaUser||!dayKeys.length) return;
+  const keys=[...new Set(dayKeys)].slice(0,40);
+  const {data:rows,error:readError}=await supa.from('daily_logs').select('date,data').eq('user_id',supaUser.id).in('date',keys);
+  if(readError){competitionSyncError='比赛分数同步失败：无法读取共享计分记录';renderCompetition();return;}
+  const existing=new Map((rows||[]).map(row=>[row.date,row.data||{}]));
+  const updatedAt=new Date().toISOString();
+  const payload=keys.map(key=>{
+    const parts=key.split('-').map(Number),date=new Date(parts[0],parts[1]-1,parts[2]);
+    const plan=planFor(date),total=plan.ex.length,done=dayDoneCount(key,total),localCompleted=total>0&&done===total;
+    const base=existing.get(key)||{};
+    const previousLocalCompleted=Boolean(base.fitnessKanban&&base.fitnessKanban.completed);
+    const completedByAnotherClient=Boolean(base.completed)&&!previousLocalCompleted;
+    const meals=base.meals&&typeof base.meals==='object'?base.meals:{breakfast:[],lunch:[],dinner:[]};
+    const sharedData={...base,date:key,workouts:Array.isArray(base.workouts)?base.workouts:[],meals,water:Number(base.water)||0,steps:Number(base.steps)||0,note:typeof base.note==='string'?base.note:'',completed:completedByAnotherClient||localCompleted,fitnessKanban:{completed:localCompleted,done,total,syncedAt:updatedAt}};
+    return {user_id:supaUser.id,date:key,data:sharedData,updated_at:updatedAt};
+  });
+  const {error}=await supa.from('daily_logs').upsert(payload,{onConflict:'user_id,date'});
+  if(error){competitionSyncError='比赛分数同步失败，本地打卡已正常保存';renderCompetition();return;}
+  competitionSyncError='';await loadCompetition();
+}
+initCompetitionModal();
 /* 把当前 state 同步到复选框 DOM（远端拉取覆盖后调用） */
 function applyStateToDOM(){
   document.querySelectorAll('.ex').forEach(ex=>{
@@ -1056,7 +1410,12 @@ async function loginEmail(e){
 async function logout(){
   if(!supa) return;
   await supa.auth.signOut();
-  supaUser=null; renderAuth();
+  supaUser=null;competition=null;competitionStatus='idle';competitionSyncError='';renderAuth();
+}
+async function refreshCompetitionAfterAuth(){
+  const keys=currentMonthCompetitionKeys();
+  if(keys.length) await syncCompetitionDays(keys);
+  else await loadCompetition();
 }
 async function initSync(){
   document.getElementById('sync-logout').onclick=logout;
@@ -1065,6 +1424,7 @@ async function initSync(){
     setSync('local');
     loginB.disabled=true; loginB.style.opacity=.55; document.getElementById('sync-email').disabled=true;
     loginB.title='尚未配置 Supabase，当前为纯本地模式';
+    competitionStatus='unavailable';competitionMessage='比赛功能等待云端配置';renderCompetition();
     return;
   }
   document.getElementById('sync-login-form').onsubmit=loginEmail;
@@ -1072,14 +1432,15 @@ async function initSync(){
   const {data:{session}}=await supa.auth.getSession();
   supaUser=session?.user||null;
   renderAuth();
-  if(supaUser) await pullAndMerge();
+  if(supaUser){await pullAndMerge();await refreshCompetitionAfterAuth();}
   supa.auth.onAuthStateChange(async (_e,sess)=>{
     supaUser=sess?.user||null;
+    if(!supaUser){competition=null;competitionStatus='idle';}
     renderAuth();
-    if(supaUser) await pullAndMerge();
+    if(supaUser){await pullAndMerge();await refreshCompetitionAfterAuth();}
   });
   // 回到页面时重新拉取，保持多设备一致
-  window.addEventListener('focus',()=>{ if(supaUser) pullAndMerge(); });
+  window.addEventListener('focus',async()=>{if(supaUser){await pullAndMerge();await refreshCompetitionAfterAuth();}});
 }
 initSync();
 

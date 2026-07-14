@@ -121,6 +121,17 @@ const SUPABASE_ANON_KEY = "eyJhbGci...";   // anon public key
 
 保存后 `git push`，Actions 自动重新部署。刷新网页顶部会出现邮箱输入框 +「发送登录链接」按钮。
 
+### 5. 启用与 HER MOVE 共用的运动竞赛
+
+“运动竞赛”复用 [Alwaysdebugg/her-move-daily](https://github.com/Alwaysdebugg/her-move-daily) 的同一个 Supabase 项目和同一张 `fitness_competitions` 比赛表，不要为两个网站分别建表。
+
+在同一个 Supabase 项目的 SQL Editor 中依次执行：
+
+1. [`supabase/schema.sql`](https://github.com/Alwaysdebugg/her-move-daily/blob/main/supabase/schema.sql)（提供安全的 `daily_logs` 计分记录）
+2. [`supabase/competition.sql`](https://github.com/Alwaysdebugg/her-move-daily/blob/main/supabase/competition.sql)（提供 `fitness_competitions` 和创建、加入、读分、结束比赛的安全 RPC）
+
+两个 GitHub Pages 地址都要加入 **Authentication → URL Configuration → Redirect URLs**。当前看板仍把完整训练状态保存在自己的 `workout_state`；只有“当天计划是否全部完成”会镜像到 `daily_logs.data.completed` 用于比赛计分，并会保留已有 HER MOVE 日志字段。比赛双方只能通过安全 RPC 看到昵称、头像和本月完成天数，看不到对方的具体训练内容。
+
 ### 常见问题
 - **没收到登录邮件**：查垃圾邮件箱；确认第 3 步 Email provider 已启用；免费项目内置邮件有发信限额，稍等再试。
 - **点邮件链接跳回来没登上**：多半是第 3 步的 Site URL / Redirect URLs 没填对，或没带结尾斜杠。
