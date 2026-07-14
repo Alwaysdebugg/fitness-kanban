@@ -134,10 +134,16 @@
   .ex .note{font-size:12px;color:var(--faint);margin-top:3px}
   .ex .vid-link{flex-shrink:0;align-self:center;display:inline-flex;align-items:center;gap:4px;background:rgba(255,42,42,.12);color:#ff6b6b;border:1px solid rgba(255,42,42,.28);border-radius:8px;padding:6px 10px;font-size:11.5px;font-weight:800;text-decoration:none;white-space:nowrap;transition:.15s}
   .ex .vid-link:hover{background:#ff2a2a;color:#fff;border-color:#ff2a2a;transform:scale(1.05)}
+  .custom-ex{background:linear-gradient(90deg,rgba(34,197,94,.07),transparent 55%)}
+  .custom-badge{display:inline-flex;vertical-align:2px;margin-left:7px;border:1px solid rgba(34,197,94,.34);border-radius:99px;background:rgba(34,197,94,.1);color:var(--accent);padding:2px 6px;font-size:9px;font-weight:800;text-decoration:none}
+  .custom-remove{flex:none;align-self:center;width:30px;height:30px;border:1px solid var(--line);border-radius:8px;background:rgba(255,255,255,.035);color:var(--faint);font-family:inherit;font-size:17px;line-height:1;cursor:pointer;transition:.15s}
+  .custom-remove:hover{border-color:rgba(239,68,68,.45);background:rgba(239,68,68,.1);color:#ff7b7b}
   .dc-foot{padding:12px 17px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--bg-soft)}
   .dc-foot .rest-i{font-size:12.5px;color:var(--muted)}
   .link-btn{background:none;border:1px solid var(--line);color:var(--muted);font-size:12px;padding:6px 11px;border-radius:8px;cursor:pointer;font-family:inherit;font-weight:600;transition:.15s}
   .link-btn:hover{color:var(--text);border-color:var(--faint)}
+  .add-exercise-btn{border-color:rgba(34,197,94,.36);background:rgba(34,197,94,.08);color:var(--accent)}
+  .add-exercise-btn:hover{border-color:var(--accent);background:rgba(34,197,94,.14);color:#67e894}
   .prog-mini{margin-left:auto;font-size:12px;color:var(--muted);font-weight:700}
   .prog-mini b{color:var(--accent)}
 
@@ -311,6 +317,8 @@
     .ex{padding:13px 14px;gap:10px}
     .ex .vid-link{padding:8px 10px}
     .link-btn{padding:8px 13px}
+    .add-exercise-btn{min-height:38px}
+    .custom-remove{width:38px;height:38px}
 
     /* 计时器：底部悬浮条 */
     .timer{left:12px;right:12px;width:auto;bottom:12px}
@@ -455,16 +463,17 @@
   .competition-tabs{display:grid;grid-template-columns:1fr 1fr;gap:5px;background:var(--bg-soft);border-radius:11px;padding:4px;margin:17px 0}
   .competition-tabs button{min-height:38px;border:0;border-radius:8px;background:transparent;color:var(--muted);font-family:inherit;font-size:12px;font-weight:800;cursor:pointer}.competition-tabs button.active{background:var(--card);color:var(--today);box-shadow:0 4px 10px rgba(0,0,0,.2)}
   .competition-modal-copy{color:var(--muted);font-size:12px;margin-bottom:13px}
-  .competition-field{display:grid;gap:6px;margin-bottom:14px}.competition-field>span,.competition-avatar-field legend{color:var(--muted);font-size:11px;font-weight:700}.competition-field input{width:100%;background:var(--bg-soft);border:1px solid var(--line);color:var(--text);border-radius:9px;padding:10px 11px;font-family:inherit;font-size:14px}.competition-field input:focus{outline:none;border-color:var(--today)}
+  .competition-field{display:grid;gap:6px;margin-bottom:14px}.competition-field>span,.competition-avatar-field legend{color:var(--muted);font-size:11px;font-weight:700}.competition-field input,.competition-field textarea{width:100%;background:var(--bg-soft);border:1px solid var(--line);color:var(--text);border-radius:9px;padding:10px 11px;font-family:inherit;font-size:14px}.competition-field textarea{min-height:74px;resize:vertical;line-height:1.5}.competition-field input:focus,.competition-field textarea:focus{outline:none;border-color:var(--today)}
   .competition-avatar-field{border:0;margin:0 0 15px}.competition-avatar-field legend{margin-bottom:7px}.competition-avatar-options{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}.competition-avatar-options button{aspect-ratio:1;border:2px solid transparent;border-radius:10px;background:var(--bg-soft);font-size:21px;cursor:pointer}.competition-avatar-options button:hover,.competition-avatar-options button.active{border-color:var(--today);background:rgba(245,158,11,.1);transform:translateY(-1px)}
   .competition-invite-field input{text-transform:uppercase;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:18px;letter-spacing:.18em;text-align:center}
   .competition-form-error{display:none;color:#ff8a8a;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.28);border-radius:9px;padding:8px 10px;font-size:11.5px;margin-bottom:12px}.competition-form-error.show{display:block}
   .competition-submit{width:100%;min-height:44px}
+  .exercise-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.exercise-form-grid .competition-field{min-width:0}
 
   @media (max-width:640px){
     .competition-card{padding:16px 12px}.competition-head{flex-direction:column;gap:10px}.competition-month{width:100%;justify-content:center}.competition-title{font-size:18px}
     .competition-empty{grid-template-columns:1fr;text-align:center;gap:12px}.competition-empty-main p{margin-left:auto;margin-right:auto}.competition-btn{width:100%;min-height:44px}.competition-race{height:174px}.competition-runner{width:76px}.competition-avatar{width:46px;height:46px;font-size:21px}.competition-label{max-width:76px}.competition-label small{display:none}.competition-gap span{display:none}
-    .competition-scoreboard{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.competition-gap-card{grid-column:1/-1;grid-row:1;min-height:54px;display:grid;grid-template-columns:1fr auto 1fr;gap:8px}.competition-gap-card small{justify-self:end}.competition-gap-card strong{margin:0}.competition-gap-card span{justify-self:start}.competition-score{padding:10px}.competition-score strong{font-size:24px}.competition-foot{align-items:stretch;flex-direction:column}.competition-motivation{flex:0 0 auto}.competition-motivation,.competition-invite{width:100%}.competition-invite{justify-content:space-between}.competition-end{align-self:center;min-height:40px}.competition-avatar-options{grid-template-columns:repeat(3,1fr)}.competition-avatar-options button{min-height:52px;aspect-ratio:auto}
+    .competition-scoreboard{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.competition-gap-card{grid-column:1/-1;grid-row:1;min-height:54px;display:grid;grid-template-columns:1fr auto 1fr;gap:8px}.competition-gap-card small{justify-self:end}.competition-gap-card strong{margin:0}.competition-gap-card span{justify-self:start}.competition-score{padding:10px}.competition-score strong{font-size:24px}.competition-foot{align-items:stretch;flex-direction:column}.competition-motivation{flex:0 0 auto}.competition-motivation,.competition-invite{width:100%}.competition-invite{justify-content:space-between}.competition-end{align-self:center;min-height:40px}.competition-avatar-options{grid-template-columns:repeat(3,1fr)}.competition-avatar-options button{min-height:52px;aspect-ratio:auto}.exercise-form-grid{grid-template-columns:1fr}
   }
 </style>
 </head>
@@ -549,7 +558,7 @@
 
   <!-- DAY DETAILS -->
   <section>
-    <div class="sec-head"><h3>每日动作详情</h3><span>勾选打卡 · 点 ▶ 教程 看 YouTube 视频 · 进度自动保存</span><div class="sec-line"></div></div>
+    <div class="sec-head"><h3>每日动作详情</h3><span>勾选打卡 · ＋添加自定义运动 · 进度自动保存</span><div class="sec-line"></div></div>
     <div class="days" id="days"></div>
   </section>
 
@@ -722,6 +731,27 @@
   </div>
 </div>
 
+<!-- 添加自定义运动 -->
+<div class="competition-modal-backdrop" id="exercise-modal" role="presentation" aria-hidden="true">
+  <div class="competition-modal" role="dialog" aria-modal="true" aria-labelledby="exercise-modal-title">
+    <div class="competition-modal-head">
+      <div><div class="competition-kicker">Custom workout</div><h3 id="exercise-modal-title">添加运动</h3></div>
+      <button class="competition-modal-close" id="exercise-modal-close" type="button" aria-label="关闭添加运动弹窗">×</button>
+    </div>
+    <p class="competition-modal-copy" id="exercise-modal-copy">为当天补充一个自定义运动，保存后会计入完成进度。</p>
+    <form id="exercise-form">
+      <label class="competition-field"><span>运动名称 *</span><input id="exercise-name" maxlength="60" required placeholder="例如：哑铃弯举" autocomplete="off"></label>
+      <div class="exercise-form-grid">
+        <label class="competition-field"><span>组数</span><input id="exercise-sets" maxlength="20" placeholder="例如：3" inputmode="text"></label>
+        <label class="competition-field"><span>次数 / 时长</span><input id="exercise-reps" maxlength="40" placeholder="例如：12 次 / 20 分钟"></label>
+      </div>
+      <label class="competition-field"><span>备注</span><textarea id="exercise-note" maxlength="160" placeholder="动作要求、重量或其他提醒（选填）"></textarea></label>
+      <div class="competition-form-error" id="exercise-form-error" role="alert"></div>
+      <button class="competition-btn competition-submit" type="submit">＋ 添加到当天</button>
+    </form>
+  </div>
+</div>
+
 <!-- Supabase client (safe: anon key is public, protected by Row Level Security) -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
@@ -827,6 +857,29 @@ function saveState(s){try{localStorage.setItem(LS,JSON.stringify(s))}catch(e){}}
 let state=loadState();
 function isChecked(dayKey,i){return !!(state[dayKey]&&state[dayKey][i])}
 function setChecked(dayKey,i,v){state[dayKey]=state[dayKey]||{};state[dayKey][i]=v;saveState(state)}
+function htmlEsc(value){return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function getCustomExercises(dayKey){
+  const map=state.__customExercises;
+  if(!map||typeof map!=='object'||!Array.isArray(map[dayKey])) return [];
+  return map[dayKey].filter(item=>item&&typeof item==='object'&&/^[a-zA-Z0-9_-]+$/.test(String(item.id))&&String(item.name||'').trim());
+}
+function customCheckKey(id){return 'custom_'+id;}
+function isCustomChecked(dayKey,id){return !!(state[dayKey]&&state[dayKey][customCheckKey(id)]);}
+function setCustomChecked(dayKey,id,value){
+  state[dayKey]=state[dayKey]||{};state[dayKey][customCheckKey(id)]=value;saveState(state);
+}
+function dayExerciseTotal(dayKey,baseTotal){return baseTotal+getCustomExercises(dayKey).length;}
+function customExerciseRowsHTML(dayKey){
+  return getCustomExercises(dayKey).map(item=>{
+    const id=String(item.id),sets=String(item.sets||'').trim(),reps=String(item.reps||'').trim();
+    const meta=[sets?`<b>${htmlEsc(sets)}</b> 组`:'',reps?`<b>${htmlEsc(reps)}</b>`:''].filter(Boolean).join(' × ');
+    return `<div class="ex custom-ex ${isCustomChecked(dayKey,id)?'checked':''}" data-day="${dayKey}" data-custom-id="${id}">
+      <label class="cbx"><input type="checkbox" ${isCustomChecked(dayKey,id)?'checked':''} onchange="onCustomCheck('${dayKey}','${id}',this)"><span class="box"></span></label>
+      <div class="body"><div class="nm">${htmlEsc(item.name)}<span class="custom-badge">自定义</span></div>${meta?`<div class="meta">${meta}</div>`:''}${item.note?`<div class="note">${htmlEsc(item.note)}</div>`:''}</div>
+      <button class="custom-remove" type="button" onclick="removeCustomExercise('${dayKey}','${id}')" aria-label="删除自定义运动 ${htmlEsc(item.name)}" title="删除">×</button>
+    </div>`;
+  }).join('');
+}
 
 /* ============ RENDER ============ */
 const WD=['周日','周一','周二','周三','周四','周五','周六'];
@@ -883,8 +936,10 @@ DAYS.forEach(d=>{
       ${d.dow===todayDow?'<span class="todaytag">今日</span>':''}
     </div>
     ${exHTML}
+    <div class="custom-exercises" id="custom-exercises-${d.dow}">${customExerciseRowsHTML(d.key)}</div>
     <div class="dc-foot">
       ${d.rest?`<span class="rest-i">休息 ${d.rest} 秒</span><button class="link-btn" onclick="setTimerAndOpen(${d.rest})">⏱️ 计时</button>`:'<span class="rest-i">主动恢复日</span>'}
+      <button class="link-btn add-exercise-btn" onclick="openExerciseModal('${d.key}')">＋ 添加</button>
       <button class="link-btn" onclick="resetDay('${d.key}')">重置</button>
       <span class="prog-mini" id="pm-${d.dow}"></span>
     </div>`;
@@ -905,6 +960,58 @@ document.getElementById('weeks').innerHTML=WEEKS.map(w=>`
   <p>${w.p}</p>${w.eg?`<div class="eg">${w.eg}</div>`:''}</div>`).join('');
 
 /* ============ CHECK / PROGRESS ============ */
+let exerciseModalDayKey='';
+function renderCustomExerciseList(dayKey){
+  const day=DAYS.find(item=>item.key===dayKey),root=day&&document.getElementById('custom-exercises-'+day.dow);
+  if(root) root.innerHTML=customExerciseRowsHTML(dayKey);
+}
+function onCustomCheck(dayKey,id,el){
+  setCustomChecked(dayKey,id,el.checked);
+  el.closest('.ex').classList.toggle('checked',el.checked);
+  updateProgress();renderCalendar();scheduleCompetitionDaySync(dayKey);
+}
+function openExerciseModal(dayKey){
+  const day=DAYS.find(item=>item.key===dayKey);if(!day) return;
+  exerciseModalDayKey=dayKey;
+  document.getElementById('exercise-modal-title').textContent='添加运动 · '+day.label;
+  document.getElementById('exercise-modal-copy').textContent=fmt(day.date)+' · '+day.name+'；保存后会计入当天完成进度。';
+  document.getElementById('exercise-form').reset();setExerciseFormError('');
+  const modal=document.getElementById('exercise-modal');modal.classList.add('show');modal.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';
+  setTimeout(()=>document.getElementById('exercise-name').focus(),30);
+}
+function closeExerciseModal(){
+  const modal=document.getElementById('exercise-modal');modal.classList.remove('show');modal.setAttribute('aria-hidden','true');document.body.style.overflow='';exerciseModalDayKey='';setExerciseFormError('');
+}
+function setExerciseFormError(message){
+  const el=document.getElementById('exercise-form-error');el.textContent=message||'';el.classList.toggle('show',!!message);
+}
+function submitExerciseForm(event){
+  event.preventDefault();
+  const name=document.getElementById('exercise-name').value.trim();
+  if(!exerciseModalDayKey||!name){setExerciseFormError('请填写运动名称');return;}
+  if(!state.__customExercises||typeof state.__customExercises!=='object') state.__customExercises={};
+  if(!Array.isArray(state.__customExercises[exerciseModalDayKey])) state.__customExercises[exerciseModalDayKey]=[];
+  const item={
+    id:'cx'+Date.now().toString(36)+Math.random().toString(36).slice(2,7),name,
+    sets:document.getElementById('exercise-sets').value.trim(),
+    reps:document.getElementById('exercise-reps').value.trim(),
+    note:document.getElementById('exercise-note').value.trim()
+  };
+  state.__customExercises[exerciseModalDayKey].push(item);saveState(state);
+  const dayKey=exerciseModalDayKey;renderCustomExerciseList(dayKey);updateProgress();renderCalendar();scheduleCompetitionDaySync(dayKey);closeExerciseModal();
+}
+function removeCustomExercise(dayKey,id){
+  const list=getCustomExercises(dayKey),item=list.find(entry=>String(entry.id)===id);if(!item) return;
+  if(!confirm('删除自定义运动“'+item.name+'”？')) return;
+  state.__customExercises[dayKey]=list.filter(entry=>String(entry.id)!==id);
+  if(state[dayKey]) delete state[dayKey][customCheckKey(id)];
+  saveState(state);renderCustomExerciseList(dayKey);updateProgress();renderCalendar();scheduleCompetitionDaySync(dayKey);
+}
+document.getElementById('exercise-modal-close').onclick=closeExerciseModal;
+document.getElementById('exercise-modal').addEventListener('mousedown',event=>{if(event.target.id==='exercise-modal')closeExerciseModal();});
+document.getElementById('exercise-form').addEventListener('submit',submitExerciseForm);
+document.addEventListener('keydown',event=>{if(event.key==='Escape'&&document.getElementById('exercise-modal').classList.contains('show'))closeExerciseModal();});
+
 function onCheck(dayKey,i,el){
   setChecked(dayKey,i,el.checked);
   el.closest('.ex').classList.toggle('checked',el.checked);
@@ -923,22 +1030,21 @@ function resetDay(dayKey){
 }
 function updateProgress(){
   DAYS.forEach(d=>{
-    const total=d.ex.length;
-    let done=0;for(let i=0;i<total;i++) if(isChecked(d.key,i)) done++;
+    const baseTotal=d.ex.length,total=dayExerciseTotal(d.key,baseTotal);
+    let done=dayDoneCount(d.key,baseTotal);
     const pm=document.getElementById('pm-'+d.dow);
     if(pm) pm.innerHTML=`<b>${done}</b>/${total}`;
     const allDone=done===total&&total>0;
     const kbCol=document.getElementById('kb-'+d.dow);
     if(kbCol) kbCol.classList.toggle('done',allDone);
     // mark checked style on load
-    for(let i=0;i<total;i++){
+    for(let i=0;i<baseTotal;i++){
       const ex=document.querySelector(`.ex[data-day="${d.key}"][data-i="${i}"]`);
       if(ex) ex.classList.toggle('checked',isChecked(d.key,i));
     }
   });
   // today ring
-  const t=todayObj,total=t.ex.length;let done=0;
-  for(let i=0;i<total;i++) if(isChecked(t.key,i)) done++;
+  const t=todayObj,baseTotal=t.ex.length,total=dayExerciseTotal(t.key,baseTotal),done=dayDoneCount(t.key,baseTotal);
   const pct=total?Math.round(done/total*100):0;
   const off=201-201*(pct/100);
   document.getElementById('ring-fg').style.strokeDashoffset=off;
@@ -964,14 +1070,15 @@ window.addEventListener('resize',()=>{clearTimeout(window.__rz);window.__rz=setT
 /* ============ CHECK-IN CALENDAR ============ */
 let calY=now.getFullYear(), calM=now.getMonth();
 function planFor(d){return DAYS.find(x=>x.dow===d.getDay());}
-function dayDoneCount(k,total){
-  const r=state[k]; if(!r) return 0;
-  let n=0; for(let i=0;i<total;i++) if(r[i]) n++;
+function dayDoneCount(k,baseTotal){
+  const r=state[k]||{};
+  let n=0;for(let i=0;i<baseTotal;i++) if(r[i]) n++;
+  getCustomExercises(k).forEach(item=>{if(r[customCheckKey(item.id)]) n++;});
   return n;
 }
 function isDayFull(d){
-  const total=planFor(d).ex.length;
-  return total>0 && dayDoneCount(dateKey(d),total)===total;
+  const k=dateKey(d),baseTotal=planFor(d).ex.length,total=dayExerciseTotal(k,baseTotal);
+  return total>0 && dayDoneCount(k,baseTotal)===total;
 }
 function renderCalendar(){
   const grid=document.getElementById('cal-grid');
@@ -984,8 +1091,8 @@ function renderCalendar(){
   for(let i=0;i<lead;i++) html+='<div class="cal-day blank"></div>';
   for(let day=1;day<=dim;day++){
     const d=new Date(calY,calM,day);
-    const plan=planFor(d), total=plan.ex.length;
-    const done=dayDoneCount(dateKey(d),total);
+    const plan=planFor(d),k=dateKey(d),baseTotal=plan.ex.length,total=dayExerciseTotal(k,baseTotal);
+    const done=dayDoneCount(k,baseTotal);
     const isFuture=d>today0;
     let cls='cal-day', sub='';
     if(isFuture) cls+=' future';
@@ -993,7 +1100,7 @@ function renderCalendar(){
     else if(done>0){cls+=' partial';sub=done+'/'+total;}
     else if(plan.cat==='rest'){cls+=' restday';sub='😴';}
     if(d.getTime()===today0.getTime()) cls+=' today';
-    html+=`<div class="${cls}" title="${dateKey(d)} · ${plan.name} · 完成 ${done}/${total}">
+    html+=`<div class="${cls}" title="${k} · ${plan.name} · 完成 ${done}/${total}">
       <span class="dnum">${day}</span>${sub?`<span class="dsub">${sub}</span>`:''}</div>`;
   }
   grid.innerHTML=html;
@@ -1016,8 +1123,8 @@ function renderCalStats(){
   for(const k in state){
     const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(k); if(!m) continue;
     const dd=new Date(+m[1],+m[2]-1,+m[3]);
-    const t=planFor(dd).ex.length;
-    const n=dayDoneCount(k,t);
+    const baseTotal=planFor(dd).ex.length,t=dayExerciseTotal(k,baseTotal);
+    const n=dayDoneCount(k,baseTotal);
     if(n>0) active++;
     if(t>0&&n===t){ total++; if(k.startsWith(ym)) month++; }
   }
@@ -1327,7 +1434,7 @@ async function syncCompetitionDays(dayKeys){
   const updatedAt=new Date().toISOString();
   const payload=keys.map(key=>{
     const parts=key.split('-').map(Number),date=new Date(parts[0],parts[1]-1,parts[2]);
-    const plan=planFor(date),total=plan.ex.length,done=dayDoneCount(key,total),localCompleted=total>0&&done===total;
+    const plan=planFor(date),baseTotal=plan.ex.length,total=dayExerciseTotal(key,baseTotal),done=dayDoneCount(key,baseTotal),localCompleted=total>0&&done===total;
     const base=existing.get(key)||{};
     const previousLocalCompleted=Boolean(base.fitnessKanban&&base.fitnessKanban.completed);
     const completedByAnotherClient=Boolean(base.completed)&&!previousLocalCompleted;
@@ -1342,8 +1449,9 @@ async function syncCompetitionDays(dayKeys){
 initCompetitionModal();
 /* 把当前 state 同步到复选框 DOM（远端拉取覆盖后调用） */
 function applyStateToDOM(){
+  DAYS.forEach(day=>renderCustomExerciseList(day.key));
   document.querySelectorAll('.ex').forEach(ex=>{
-    const k=ex.dataset.day, i=+ex.dataset.i, on=isChecked(k,i);
+    const k=ex.dataset.day,on=ex.dataset.customId?isCustomChecked(k,ex.dataset.customId):isChecked(k,+ex.dataset.i);
     const inp=ex.querySelector('input'); if(inp) inp.checked=on;
     ex.classList.toggle('checked',on);
   });
