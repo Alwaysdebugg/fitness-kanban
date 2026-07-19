@@ -148,6 +148,11 @@
   .prog-mini b{color:var(--accent)}
 
   /* ---------- Exercise library ---------- */
+  .exercise-library-toggle{display:inline-flex;align-items:center;gap:6px;margin-left:auto;border:1px solid var(--line);border-radius:9px;background:var(--card);color:var(--muted);padding:7px 11px;font:700 12px/1 inherit;cursor:pointer;transition:.15s;white-space:nowrap}
+  .exercise-library-toggle:hover{border-color:var(--faint);color:var(--text)}
+  .exercise-library-toggle .chevron{font-size:13px;transition:transform .2s ease}
+  .exercise-library-toggle[aria-expanded="false"] .chevron{transform:rotate(-90deg)}
+  .exercise-library-content[hidden]{display:none}
   .exercise-library-toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
   .exercise-library-search{display:flex;align-items:center;gap:8px;min-width:240px;background:var(--card);border:1px solid var(--line);border-radius:11px;padding:0 12px;color:var(--faint);transition:.15s}
   .exercise-library-search:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px rgba(34,197,94,.1)}
@@ -600,16 +605,21 @@
 
   <!-- EXERCISE LIBRARY -->
   <section id="exercise-library">
-    <div class="sec-head"><h3>运动项目库</h3><span id="exercise-library-subtitle">选择项目添加到今天</span><div class="sec-line"></div></div>
-    <div class="exercise-library-toolbar">
-      <label class="exercise-library-search" for="exercise-library-search">
-        <span aria-hidden="true">⌕</span>
-        <input id="exercise-library-search" type="search" placeholder="搜索动作或训练部位" autocomplete="off">
-      </label>
-      <div class="exercise-library-filters" id="exercise-library-filters" aria-label="按训练类别筛选"></div>
-      <span class="exercise-library-count" id="exercise-library-count"></span>
+    <div class="sec-head">
+      <h3>运动项目库</h3><span id="exercise-library-subtitle">选择项目添加到今天</span><div class="sec-line"></div>
+      <button class="exercise-library-toggle" id="exercise-library-toggle" type="button" aria-expanded="true" aria-controls="exercise-library-content"><span id="exercise-library-toggle-label">收起</span><span class="chevron" aria-hidden="true">⌃</span></button>
     </div>
-    <div class="exercise-library-grid" id="exercise-library-list" aria-live="polite"></div>
+    <div class="exercise-library-content" id="exercise-library-content">
+      <div class="exercise-library-toolbar">
+        <label class="exercise-library-search" for="exercise-library-search">
+          <span aria-hidden="true">⌕</span>
+          <input id="exercise-library-search" type="search" placeholder="搜索动作或训练部位" autocomplete="off">
+        </label>
+        <div class="exercise-library-filters" id="exercise-library-filters" aria-label="按训练类别筛选"></div>
+        <span class="exercise-library-count" id="exercise-library-count"></span>
+      </div>
+      <div class="exercise-library-grid" id="exercise-library-list" aria-live="polite"></div>
+    </div>
   </section>
 
   <!-- DAY DETAILS -->
@@ -1092,6 +1102,14 @@ function customExerciseRowsHTML(dayKey){
 }
 
 let exerciseLibraryFilter='全部';
+const EXERCISE_LIBRARY_OPEN_KEY='fitkanban_exercise_library_open';
+function setExerciseLibraryOpen(open,persist){
+  const button=document.getElementById('exercise-library-toggle'),content=document.getElementById('exercise-library-content');
+  if(!button||!content) return;
+  button.setAttribute('aria-expanded',String(open));content.hidden=!open;
+  document.getElementById('exercise-library-toggle-label').textContent=open?'收起':'展开';
+  if(persist!==false) localStorage.setItem(EXERCISE_LIBRARY_OPEN_KEY,open?'1':'0');
+}
 function normalizeExerciseName(value){return String(value||'').trim().toLocaleLowerCase().replace(/\s+/g,' ');}
 function isLibraryExerciseAdded(item){
   const name=normalizeExerciseName(item.name);
@@ -1201,6 +1219,8 @@ DAYS.forEach(d=>{
 
 document.getElementById('exercise-library-subtitle').textContent=fmt(todayObj.date)+' · 选择项目添加到今天';
 document.getElementById('exercise-library-search').addEventListener('input',renderExerciseLibrary);
+document.getElementById('exercise-library-toggle').addEventListener('click',event=>setExerciseLibraryOpen(event.currentTarget.getAttribute('aria-expanded')!=='true'));
+setExerciseLibraryOpen(localStorage.getItem(EXERCISE_LIBRARY_OPEN_KEY)!=='0',false);
 renderExerciseLibraryFilters();
 renderExerciseLibrary();
 
