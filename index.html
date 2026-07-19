@@ -147,6 +147,32 @@
   .prog-mini{margin-left:auto;font-size:12px;color:var(--muted);font-weight:700}
   .prog-mini b{color:var(--accent)}
 
+  /* ---------- Exercise library ---------- */
+  .exercise-library-toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+  .exercise-library-search{display:flex;align-items:center;gap:8px;min-width:240px;background:var(--card);border:1px solid var(--line);border-radius:11px;padding:0 12px;color:var(--faint);transition:.15s}
+  .exercise-library-search:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px rgba(34,197,94,.1)}
+  .exercise-library-search input{width:100%;min-width:0;border:0;outline:0;background:transparent;color:var(--text);font:inherit;font-size:13.5px;padding:10px 0}
+  .exercise-library-search input::placeholder{color:var(--faint)}
+  .exercise-library-filters{display:flex;gap:7px;flex-wrap:wrap}
+  .exercise-library-filter{border:1px solid var(--line);border-radius:99px;background:var(--card);color:var(--muted);padding:7px 12px;font:600 12px/1 inherit;cursor:pointer;transition:.15s;white-space:nowrap}
+  .exercise-library-filter:hover{border-color:var(--faint);color:var(--text)}
+  .exercise-library-filter.active{border-color:rgba(34,197,94,.55);background:rgba(34,197,94,.12);color:#67e894}
+  .exercise-library-count{margin-left:auto;color:var(--faint);font-size:12px;white-space:nowrap}
+  .exercise-library-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(225px,1fr));gap:11px}
+  .exercise-library-item{display:flex;flex-direction:column;min-height:190px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:15px;transition:.16s}
+  .exercise-library-item:hover{border-color:var(--faint);transform:translateY(-2px);box-shadow:0 10px 24px rgba(0,0,0,.2)}
+  .exercise-library-head{display:flex;align-items:center;gap:9px}
+  .exercise-library-icon{display:grid;place-items:center;width:34px;height:34px;flex:none;border-radius:10px;background:var(--bg-soft);font-size:18px}
+  .exercise-library-name{font-size:14.5px;font-weight:800;line-height:1.3}
+  .exercise-library-category{color:var(--faint);font-size:10.5px;margin-top:2px}
+  .exercise-library-meta{margin-top:12px;color:var(--muted);font-size:12.5px}
+  .exercise-library-meta b{color:var(--text)}
+  .exercise-library-note{margin:5px 0 13px;color:var(--faint);font-size:12px;line-height:1.45}
+  .exercise-library-add{width:100%;min-height:38px;margin-top:auto;border:1px solid rgba(34,197,94,.38);border-radius:9px;background:rgba(34,197,94,.09);color:var(--accent);font:800 12.5px inherit;cursor:pointer;transition:.15s}
+  .exercise-library-add:hover:not(:disabled){border-color:var(--accent);background:rgba(34,197,94,.17);color:#76ee9f}
+  .exercise-library-add:disabled{border-color:var(--line);background:rgba(255,255,255,.025);color:var(--faint);cursor:default}
+  .exercise-library-empty{grid-column:1/-1;padding:34px 18px;border:1px dashed var(--line);border-radius:14px;color:var(--faint);font-size:13px;text-align:center}
+
   /* ---------- Generic info cards ---------- */
   .grid{display:grid;gap:14px}
   .g-2{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
@@ -321,6 +347,15 @@
     .link-btn{padding:8px 13px}
     .add-exercise-btn{min-height:38px}
     .custom-remove{width:38px;height:38px}
+
+    /* 项目库：筛选横向滚动，卡片单列 */
+    .exercise-library-search{width:100%;min-width:0}
+    .exercise-library-filters{width:calc(100% + 12px);margin-right:-12px;flex-wrap:nowrap;overflow-x:auto;padding:1px 12px 4px 0;-webkit-overflow-scrolling:touch}
+    .exercise-library-filters::-webkit-scrollbar{height:0}
+    .exercise-library-count{width:100%;margin-left:0}
+    .exercise-library-grid{grid-template-columns:1fr}
+    .exercise-library-item{min-height:0}
+    .exercise-library-add{min-height:44px}
 
     /* 计时器：底部悬浮条 */
     .timer{left:12px;right:12px;width:auto;bottom:12px}
@@ -561,6 +596,20 @@
   <section>
     <div class="sec-head"><h3>本周训练安排</h3><span>点击卡片跳转当天动作</span><div class="sec-line"></div></div>
     <div class="kanban" id="kanban"></div>
+  </section>
+
+  <!-- EXERCISE LIBRARY -->
+  <section id="exercise-library">
+    <div class="sec-head"><h3>运动项目库</h3><span id="exercise-library-subtitle">选择项目添加到今天</span><div class="sec-line"></div></div>
+    <div class="exercise-library-toolbar">
+      <label class="exercise-library-search" for="exercise-library-search">
+        <span aria-hidden="true">⌕</span>
+        <input id="exercise-library-search" type="search" placeholder="搜索动作或训练部位" autocomplete="off">
+      </label>
+      <div class="exercise-library-filters" id="exercise-library-filters" aria-label="按训练类别筛选"></div>
+      <span class="exercise-library-count" id="exercise-library-count"></span>
+    </div>
+    <div class="exercise-library-grid" id="exercise-library-list" aria-live="polite"></div>
   </section>
 
   <!-- DAY DETAILS -->
@@ -855,6 +904,32 @@ const DAYS=[
     ]},
 ];
 
+const EXERCISE_LIBRARY=[
+  {id:'goblet-squat',cat:'下肢',ico:'🦵',name:'Goblet Squat',sets:'4',reps:'12–15',note:'壶铃贴胸，下蹲时膝盖与脚尖同向'},
+  {id:'bulgarian-split-squat',cat:'下肢',ico:'🦵',name:'Bulgarian Split Squat',sets:'4',reps:'每腿 10–12',note:'后脚垫高，重心稳定压在前腿'},
+  {id:'romanian-deadlift',cat:'下肢',ico:'🦵',name:'Romanian Deadlift',sets:'4',reps:'12–15',note:'髋部后推，保持背部中立'},
+  {id:'glute-bridge',cat:'下肢',ico:'🦵',name:'Glute Bridge',sets:'4',reps:'15–20',note:'顶端夹紧臀部并停顿 1 秒'},
+  {id:'reverse-lunge',cat:'下肢',ico:'🦵',name:'Reverse Lunge',sets:'3',reps:'每腿 12',note:'向后迈步，前脚掌保持稳定'},
+  {id:'calf-raise',cat:'下肢',ico:'🦵',name:'Calf Raise',sets:'4',reps:'20',note:'最高点停顿，缓慢下放'},
+  {id:'push-up',cat:'上肢',ico:'💪',name:'Push-up',sets:'4',reps:'接近力竭',note:'身体保持直线，全程控制'},
+  {id:'single-arm-row',cat:'上肢',ico:'💪',name:'Single-arm Row',sets:'4',reps:'每侧 12–15',note:'拉向髋部，肩胛骨向后收'},
+  {id:'overhead-press',cat:'上肢',ico:'💪',name:'Overhead Press',sets:'3',reps:'每侧 12',note:'核心收紧，避免腰部过伸'},
+  {id:'floor-press',cat:'上肢',ico:'💪',name:'Floor Press',sets:'3',reps:'每侧 15',note:'仰卧推举，手肘轻触地面'},
+  {id:'biceps-curl',cat:'上肢',ico:'💪',name:'Biceps Curl',sets:'3',reps:'12–15',note:'固定手肘，控制离心阶段'},
+  {id:'triceps-extension',cat:'上肢',ico:'💪',name:'Triceps Extension',sets:'3',reps:'12–15',note:'保持大臂稳定，充分伸展手肘'},
+  {id:'plank',cat:'核心',ico:'🔥',name:'Plank',sets:'3',reps:'45–60 秒',note:'收紧臀腹，避免塌腰'},
+  {id:'dead-bug',cat:'核心',ico:'🔥',name:'Dead Bug',sets:'3',reps:'每侧 10–12',note:'腰背贴地，对侧手脚缓慢伸展'},
+  {id:'russian-twist',cat:'核心',ico:'🔥',name:'Russian Twist',sets:'3',reps:'20',note:'躯干稳定转动，避免只摆动手臂'},
+  {id:'bird-dog',cat:'核心',ico:'🔥',name:'Bird Dog',sets:'3',reps:'每侧 12',note:'对侧手脚伸展，保持骨盆稳定'},
+  {id:'brisk-walk',cat:'有氧',ico:'🫀',name:'快走',sets:'—',reps:'30–40 分钟',note:'保持可以对话、微微出汗的强度'},
+  {id:'high-knees',cat:'有氧',ico:'🫀',name:'原地高抬腿',sets:'4',reps:'45 秒',note:'保持躯干直立，落地轻柔'},
+  {id:'jump-rope',cat:'有氧',ico:'🫀',name:'跳绳',sets:'5',reps:'2 分钟',note:'组间休息 45–60 秒'},
+  {id:'mountain-climber',cat:'有氧',ico:'🫀',name:'登山跑',sets:'4',reps:'40 秒',note:'双手稳定撑地，膝盖交替向前'},
+  {id:'full-body-stretch',cat:'拉伸',ico:'🧘',name:'全身拉伸',sets:'—',reps:'10 分钟',note:'重点放松髋部和大腿前后侧'},
+  {id:'hip-flexor-stretch',cat:'拉伸',ico:'🧘',name:'髋屈肌拉伸',sets:'2',reps:'每侧 45 秒',note:'骨盆微微后倾，避免腰部代偿'},
+  {id:'cat-cow',cat:'拉伸',ico:'🧘',name:'猫牛式',sets:'2',reps:'10 次',note:'配合呼吸缓慢活动脊柱'},
+];
+
 const MEALS=[
   {t:'早餐',ico:'🌅',items:['燕麦 80 g','牛奶 500 ml','鸡蛋 3 个','香蕉 1 根'],p:'40 g',c:'80 g'},
   {t:'午餐',ico:'🍱',items:['米饭 250 g','鸡胸肉 200 g','西兰花','少量橄榄油'],p:'60 g',c:'70 g'},
@@ -1010,10 +1085,53 @@ function customExerciseRowsHTML(dayKey){
     const meta=[sets?`<b>${htmlEsc(sets)}</b> 组`:'',reps?`<b>${htmlEsc(reps)}</b>`:''].filter(Boolean).join(' × ');
     return `<div class="ex custom-ex ${isCustomChecked(dayKey,id)?'checked':''}" data-day="${dayKey}" data-custom-id="${id}">
       <label class="cbx"><input type="checkbox" ${isCustomChecked(dayKey,id)?'checked':''} onchange="onCustomCheck('${dayKey}','${id}',this)"><span class="box"></span></label>
-      <div class="body"><div class="nm">${htmlEsc(item.name)}<span class="custom-badge">自定义</span></div>${meta?`<div class="meta">${meta}</div>`:''}${item.note?`<div class="note">${htmlEsc(item.note)}</div>`:''}</div>
+      <div class="body"><div class="nm">${htmlEsc(item.name)}<span class="custom-badge">${item.libraryId?'项目库':'自定义'}</span></div>${meta?`<div class="meta">${meta}</div>`:''}${item.note?`<div class="note">${htmlEsc(item.note)}</div>`:''}</div>
       <button class="custom-remove" type="button" onclick="removeCustomExercise('${dayKey}','${id}')" aria-label="删除自定义运动 ${htmlEsc(item.name)}" title="删除">×</button>
     </div>`;
   }).join('');
+}
+
+let exerciseLibraryFilter='全部';
+function normalizeExerciseName(value){return String(value||'').trim().toLocaleLowerCase().replace(/\s+/g,' ');}
+function isLibraryExerciseAdded(item){
+  const name=normalizeExerciseName(item.name);
+  return todayObj.ex.some(entry=>normalizeExerciseName(entry.n)===name)||getCustomExercises(todayObj.key).some(entry=>entry.libraryId===item.id||normalizeExerciseName(entry.name)===name);
+}
+function renderExerciseLibraryFilters(){
+  const root=document.getElementById('exercise-library-filters');if(!root) return;
+  const categories=['全部',...new Set(EXERCISE_LIBRARY.map(item=>item.cat))];
+  root.innerHTML=categories.map(category=>`<button class="exercise-library-filter ${exerciseLibraryFilter===category?'active':''}" type="button" data-category="${htmlEsc(category)}" aria-pressed="${exerciseLibraryFilter===category}">${htmlEsc(category)}</button>`).join('');
+  root.querySelectorAll('[data-category]').forEach(button=>button.addEventListener('click',()=>{
+    exerciseLibraryFilter=button.dataset.category;renderExerciseLibraryFilters();renderExerciseLibrary();
+  }));
+}
+function renderExerciseLibrary(){
+  const root=document.getElementById('exercise-library-list'),input=document.getElementById('exercise-library-search'),count=document.getElementById('exercise-library-count');
+  if(!root||!input||!count) return;
+  const query=normalizeExerciseName(input.value);
+  const visible=EXERCISE_LIBRARY.filter(item=>(exerciseLibraryFilter==='全部'||item.cat===exerciseLibraryFilter)&&(!query||normalizeExerciseName([item.name,item.cat,item.note].join(' ')).includes(query)));
+  const addedTotal=EXERCISE_LIBRARY.filter(isLibraryExerciseAdded).length;
+  count.textContent='显示 '+visible.length+' 项 · '+addedTotal+' 项已在今天';
+  root.innerHTML=visible.length?visible.map(item=>{
+    const added=isLibraryExerciseAdded(item),sets=String(item.sets||'').trim(),reps=String(item.reps||'').trim();
+    const meta=[sets&&sets!=='—'?`<b>${htmlEsc(sets)}</b> 组`:'',reps?`<b>${htmlEsc(reps)}</b>`:''].filter(Boolean).join(' × ');
+    return `<article class="exercise-library-item" data-library-card="${htmlEsc(item.id)}">
+      <div class="exercise-library-head"><span class="exercise-library-icon" aria-hidden="true">${item.ico}</span><div><div class="exercise-library-name">${htmlEsc(item.name)}</div><div class="exercise-library-category">${htmlEsc(item.cat)}</div></div></div>
+      ${meta?`<div class="exercise-library-meta">${meta}</div>`:''}
+      <div class="exercise-library-note">${htmlEsc(item.note)}</div>
+      <button class="exercise-library-add" type="button" data-library-id="${htmlEsc(item.id)}" ${added?'disabled':''}>${added?'✓ 当天已有':'＋ 添加到今天'}</button>
+    </article>`;
+  }).join(''):'<div class="exercise-library-empty">没有找到匹配的运动项目，换个关键词试试。</div>';
+  root.querySelectorAll('[data-library-id]:not(:disabled)').forEach(button=>button.addEventListener('click',()=>addLibraryExercise(button.dataset.libraryId)));
+}
+function addLibraryExercise(id){
+  const item=EXERCISE_LIBRARY.find(entry=>entry.id===id);if(!item||isLibraryExerciseAdded(item)) return;
+  if(!state.__customExercises||typeof state.__customExercises!=='object'||Array.isArray(state.__customExercises)) state.__customExercises={};
+  if(!Array.isArray(state.__customExercises[todayObj.key])) state.__customExercises[todayObj.key]=[];
+  state.__customExercises[todayObj.key].push({
+    id:'cx'+Date.now().toString(36)+Math.random().toString(36).slice(2,7),libraryId:item.id,name:item.name,sets:item.sets,reps:item.reps,note:item.note
+  });
+  saveState(state);renderCustomExerciseList(todayObj.key);updateProgress();renderCalendar();scheduleCompetitionDaySync(todayObj.key);renderExerciseLibrary();
 }
 
 /* ============ RENDER ============ */
@@ -1081,6 +1199,11 @@ DAYS.forEach(d=>{
   daysEl.appendChild(card);
 });
 
+document.getElementById('exercise-library-subtitle').textContent=fmt(todayObj.date)+' · 选择项目添加到今天';
+document.getElementById('exercise-library-search').addEventListener('input',renderExerciseLibrary);
+renderExerciseLibraryFilters();
+renderExerciseLibrary();
+
 // meals
 document.getElementById('meals').innerHTML=MEALS.map(m=>`
   <div class="card">
@@ -1133,14 +1256,14 @@ function submitExerciseForm(event){
     note:document.getElementById('exercise-note').value.trim()
   };
   state.__customExercises[exerciseModalDayKey].push(item);saveState(state);
-  const dayKey=exerciseModalDayKey;renderCustomExerciseList(dayKey);updateProgress();renderCalendar();scheduleCompetitionDaySync(dayKey);closeExerciseModal();
+  const dayKey=exerciseModalDayKey;renderCustomExerciseList(dayKey);updateProgress();renderCalendar();scheduleCompetitionDaySync(dayKey);if(dayKey===todayObj.key) renderExerciseLibrary();closeExerciseModal();
 }
 function removeCustomExercise(dayKey,id){
   const list=getCustomExercises(dayKey),item=list.find(entry=>String(entry.id)===id);if(!item) return;
   if(!confirm('删除自定义运动“'+item.name+'”？')) return;
   state.__customExercises[dayKey]=list.filter(entry=>String(entry.id)!==id);
   if(state[dayKey]) delete state[dayKey][customCheckKey(id)];
-  saveState(state);renderCustomExerciseList(dayKey);updateProgress();renderCalendar();scheduleCompetitionDaySync(dayKey);
+  saveState(state);renderCustomExerciseList(dayKey);updateProgress();renderCalendar();scheduleCompetitionDaySync(dayKey);if(dayKey===todayObj.key) renderExerciseLibrary();
 }
 document.getElementById('exercise-modal-close').onclick=closeExerciseModal;
 document.getElementById('exercise-modal').addEventListener('mousedown',event=>{if(event.target.id==='exercise-modal')closeExerciseModal();});
@@ -1603,6 +1726,7 @@ initCompetitionModal();
 function applyStateToDOM(){
   renderProfile();
   DAYS.forEach(day=>renderCustomExerciseList(day.key));
+  renderExerciseLibrary();
   document.querySelectorAll('.ex').forEach(ex=>{
     const k=ex.dataset.day,on=ex.dataset.customId?isCustomChecked(k,ex.dataset.customId):isChecked(k,+ex.dataset.i);
     const inp=ex.querySelector('input'); if(inp) inp.checked=on;
