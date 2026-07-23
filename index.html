@@ -444,6 +444,30 @@
   .cal-legend .lg.todaylg{background:transparent;border:2px solid var(--today)}
   @media (max-width:900px){.cal-wrap{grid-template-columns:1fr}}
 
+  /* ---------- Workout frequency chart ---------- */
+  .frequency-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow)}
+  .frequency-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:14px}
+  .frequency-title{font-size:16px;font-weight:800}
+  .frequency-copy{color:var(--muted);font-size:12px;margin-top:3px}
+  .frequency-ranges{display:flex;gap:6px;padding:4px;background:var(--bg-soft);border-radius:11px}
+  .frequency-range{min-height:34px;border:0;border-radius:8px;background:transparent;color:var(--muted);padding:0 12px;font-family:inherit;font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap;transition:.15s}
+  .frequency-range:hover{color:var(--text)}
+  .frequency-range.active{background:var(--text);color:var(--on-solid);box-shadow:0 4px 10px var(--tint)}
+  .frequency-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-bottom:14px}
+  .frequency-stat{border:1px solid var(--line);border-radius:11px;background:var(--bg-soft);padding:10px 12px}
+  .frequency-stat b{display:block;font-size:19px;line-height:1.2}
+  .frequency-stat span{display:block;color:var(--muted);font-size:10.5px;margin-top:3px}
+  .frequency-chart-shell{position:relative;border:1px solid var(--line);border-radius:13px;background:linear-gradient(180deg,var(--subtle),transparent);padding:8px 8px 2px;overflow:hidden}
+  .frequency-chart{display:block;width:100%;height:260px;overflow:visible}
+  .frequency-grid{stroke:var(--line);stroke-width:1}
+  .frequency-axis-label{fill:var(--faint);font-family:inherit;font-size:10px}
+  .frequency-area{fill:var(--tint-strong)}
+  .frequency-line{fill:none;stroke:var(--text);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+  .frequency-point{fill:var(--card);stroke:var(--text);stroke-width:2}
+  .frequency-hit{fill:transparent;cursor:crosshair}
+  .frequency-hit:focus{outline:none;stroke:var(--text);stroke-width:1.5;fill:var(--subtle)}
+  .frequency-foot{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:var(--faint);font-size:10.5px;margin-top:9px}
+
   /* ===== cloud sync bar ===== */
   .syncbar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;
     background:var(--card);border:1px solid var(--line);border-radius:12px;
@@ -558,6 +582,7 @@
     .competition-card{padding:16px 12px}.competition-head{flex-direction:column;gap:10px}.competition-month{width:100%;justify-content:center}.competition-title{font-size:18px}
     .competition-empty{grid-template-columns:1fr;text-align:center;gap:12px}.competition-empty-main p{margin-left:auto;margin-right:auto}.competition-btn{width:100%;min-height:44px}.competition-race{height:174px}.competition-track{right:115px}.competition-runner{width:138px;transform:translateX(-23px);grid-template-columns:46px minmax(0,1fr);gap:6px}.competition-runner.me{top:20px}.competition-runner.opponent{bottom:20px}.competition-crown{left:13px}.competition-avatar{width:46px;height:46px;font-size:21px}.competition-label{padding:4px 6px}.competition-label b{font-size:10px}.competition-label small{font-size:8px}.competition-gap span{display:none}
     .competition-scoreboard{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.competition-gap-card{grid-column:1/-1;grid-row:1;min-height:54px;display:grid;grid-template-columns:1fr auto 1fr;gap:8px}.competition-gap-card small{justify-self:end}.competition-gap-card strong{margin:0}.competition-gap-card span{justify-self:start}.competition-score{padding:10px}.competition-score strong{font-size:24px}.competition-foot{align-items:stretch;flex-direction:column}.competition-motivation{flex:0 0 auto}.competition-motivation,.competition-invite{width:100%}.competition-invite{justify-content:space-between}.competition-end{align-self:center;min-height:40px}.competition-avatar-options{grid-template-columns:repeat(3,1fr)}.competition-avatar-options button{min-height:52px;aspect-ratio:auto}.exercise-form-grid{grid-template-columns:1fr}
+    .frequency-card{padding:14px 10px}.frequency-top{flex-direction:column;gap:10px}.frequency-ranges{width:100%}.frequency-range{flex:1;padding:0 7px}.frequency-stats{gap:6px}.frequency-stat{padding:9px 8px}.frequency-stat b{font-size:17px}.frequency-chart{height:230px}.frequency-chart-shell{padding-left:2px;padding-right:2px}
   }
 </style>
 </head>
@@ -699,6 +724,33 @@
         </div>
         <div class="callout" style="margin-top:12px">当天所有动作都勾选即算「全部完成」；周日休息日不打卡也不会中断连续记录。</div>
       </div>
+    </div>
+  </section>
+
+  <!-- WORKOUT FREQUENCY TREND -->
+  <section id="frequency-trend">
+    <div class="sec-head"><h3>运动频率趋势</h3><span>每天完成的运动项目数</span><div class="sec-line"></div></div>
+    <div class="frequency-card">
+      <div class="frequency-top">
+        <div>
+          <div class="frequency-title">训练起伏折线图</div>
+          <div class="frequency-copy">数值越高，代表当天完成并勾选的运动项目越多。</div>
+        </div>
+        <div class="frequency-ranges" role="group" aria-label="选择运动频率统计范围">
+          <button class="frequency-range active" type="button" data-frequency-days="7" aria-pressed="true">近 7 天</button>
+          <button class="frequency-range" type="button" data-frequency-days="30" aria-pressed="false">近 30 天</button>
+          <button class="frequency-range" type="button" data-frequency-days="90" aria-pressed="false">近 3 个月</button>
+        </div>
+      </div>
+      <div class="frequency-stats">
+        <div class="frequency-stat"><b id="frequency-active-days">0</b><span>活跃天数</span></div>
+        <div class="frequency-stat"><b id="frequency-total-items">0</b><span>累计完成项目</span></div>
+        <div class="frequency-stat"><b id="frequency-daily-average">0</b><span>日均完成项目</span></div>
+      </div>
+      <div class="frequency-chart-shell">
+        <svg class="frequency-chart" id="frequency-chart" role="img" aria-labelledby="frequency-chart-title frequency-chart-desc"></svg>
+      </div>
+      <div class="frequency-foot"><span id="frequency-range-label">最近 7 天</span><span>纵轴：完成项目数 · 聚焦圆点可查看当天详情</span></div>
     </div>
   </section>
 
@@ -1392,6 +1444,60 @@ function resetDay(dayKey){
   if(typeof renderCalendar==='function') renderCalendar();
   scheduleCompetitionDaySync(dayKey);
 }
+
+const FREQUENCY_RANGE_LS='fitkanban_frequency_range';
+const savedFrequencyRange=Number(localStorage.getItem(FREQUENCY_RANGE_LS));
+var frequencyRangeDays=[7,30,90].includes(savedFrequencyRange)?savedFrequencyRange:7;
+function frequencySeries(days){
+  const end=new Date(now);end.setHours(0,0,0,0);
+  return Array.from({length:days},(_,index)=>{
+    const date=new Date(end);date.setDate(end.getDate()-(days-1-index));
+    const key=dateKey(date),plan=planFor(date),baseTotal=plan.ex.length;
+    return {date,key,value:dayDoneCount(key,baseTotal),total:dayExerciseTotal(key,baseTotal)};
+  });
+}
+function frequencyDateLabel(date){return (date.getMonth()+1)+'/'+date.getDate();}
+function renderFrequencyChart(){
+  const svg=document.getElementById('frequency-chart');if(!svg) return;
+  const data=frequencySeries(frequencyRangeDays),completed=data.reduce((sum,item)=>sum+item.value,0),active=data.filter(item=>item.value>0).length;
+  document.getElementById('frequency-active-days').textContent=active;
+  document.getElementById('frequency-total-items').textContent=completed;
+  document.getElementById('frequency-daily-average').textContent=(completed/frequencyRangeDays).toFixed(1);
+  document.getElementById('frequency-range-label').textContent=fmt(data[0].date)+' – '+fmt(data[data.length-1].date);
+  document.querySelectorAll('[data-frequency-days]').forEach(button=>{
+    const selected=Number(button.dataset.frequencyDays)===frequencyRangeDays;
+    button.classList.toggle('active',selected);button.setAttribute('aria-pressed',String(selected));
+  });
+
+  const width=Math.max(360,Math.round(svg.clientWidth||900)),height=260,margin={top:18,right:14,bottom:34,left:38};
+  const plotWidth=width-margin.left-margin.right,plotHeight=height-margin.top-margin.bottom;
+  const peak=Math.max(...data.map(item=>item.value),0),yMax=Math.max(4,Math.ceil(peak/2)*2);
+  const x=index=>margin.left+(data.length===1?0:index/(data.length-1)*plotWidth);
+  const y=value=>margin.top+(1-value/yMax)*plotHeight;
+  const points=data.map((item,index)=>[x(index),y(item.value)]);
+  const linePath=points.map((point,index)=>(index?'L':'M')+point[0].toFixed(2)+' '+point[1].toFixed(2)).join(' ');
+  const areaPath=linePath+' L '+x(data.length-1).toFixed(2)+' '+(margin.top+plotHeight)+' L '+x(0).toFixed(2)+' '+(margin.top+plotHeight)+' Z';
+  const yTicks=[0,yMax/2,yMax];
+  const xTickCount=frequencyRangeDays===7?7:6;
+  const xTickIndexes=[...new Set(Array.from({length:xTickCount},(_,index)=>Math.round(index*(data.length-1)/(xTickCount-1))))];
+  const grid=yTicks.map(value=>`<line class="frequency-grid" x1="${margin.left}" y1="${y(value)}" x2="${width-margin.right}" y2="${y(value)}"/><text class="frequency-axis-label" x="${margin.left-8}" y="${y(value)+3}" text-anchor="end">${value}</text>`).join('');
+  const xLabels=xTickIndexes.map(index=>`<text class="frequency-axis-label" x="${x(index)}" y="${height-10}" text-anchor="${index===0?'start':index===data.length-1?'end':'middle'}">${frequencyDateLabel(data[index].date)}</text>`).join('');
+  const pointRadius=frequencyRangeDays===7?4:frequencyRangeDays===30?3:2;
+  const visiblePoints=data.map((item,index)=>(frequencyRangeDays<=30||item.value>0||index===data.length-1)?`<circle class="frequency-point" cx="${x(index)}" cy="${y(item.value)}" r="${pointRadius}"/>`:'').join('');
+  const hitPoints=data.map((item,index)=>{
+    const label=item.date.getFullYear()+'年'+fmt(item.date)+'：完成 '+item.value+' / '+item.total+' 项';
+    return `<circle class="frequency-hit" cx="${x(index)}" cy="${y(item.value)}" r="${frequencyRangeDays===90?5:8}" tabindex="0" role="img" aria-label="${htmlEsc(label)}"><title>${htmlEsc(label)}</title></circle>`;
+  }).join('');
+  svg.setAttribute('viewBox',`0 0 ${width} ${height}`);
+  svg.innerHTML=`<title id="frequency-chart-title">最近 ${frequencyRangeDays} 天运动频率折线图</title><desc id="frequency-chart-desc">按日期展示每天完成的运动项目数，当前范围共有 ${active} 个活跃日，累计完成 ${completed} 个项目。</desc>${grid}<path class="frequency-area" d="${areaPath}"/><path class="frequency-line" d="${linePath}"/>${visiblePoints}${hitPoints}${xLabels}`;
+}
+function setFrequencyRange(days){
+  if(![7,30,90].includes(days)) return;
+  frequencyRangeDays=days;localStorage.setItem(FREQUENCY_RANGE_LS,String(days));renderFrequencyChart();
+}
+document.querySelectorAll('[data-frequency-days]').forEach(button=>button.addEventListener('click',()=>setFrequencyRange(Number(button.dataset.frequencyDays))));
+window.addEventListener('resize',()=>{clearTimeout(window.__frequencyResize);window.__frequencyResize=setTimeout(renderFrequencyChart,180);});
+
 function updateProgress(){
   DAYS.forEach(d=>{
     const baseTotal=d.ex.length,total=dayExerciseTotal(d.key,baseTotal);
@@ -1414,6 +1520,7 @@ function updateProgress(){
   document.getElementById('ring-fg').style.strokeDashoffset=off;
   document.getElementById('ring-pct').textContent=pct+'%';
   document.getElementById('ring-fg').style.stroke=pct===100?'var(--accent)':'var(--today)';
+  renderFrequencyChart();
 }
 updateProgress();
 
