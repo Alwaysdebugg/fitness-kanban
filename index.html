@@ -1088,7 +1088,30 @@ function isCustomChecked(dayKey,id){return !!(state[dayKey]&&state[dayKey][custo
 function setCustomChecked(dayKey,id,value){
   state[dayKey]=state[dayKey]||{};state[dayKey][customCheckKey(id)]=value;saveState(state);
 }
-function dayExerciseTotal(dayKey,baseTotal){return baseTotal+getCustomExercises(dayKey).length;}
+function getDeletedPresetIndexes(dayKey){
+  const map=state.__deletedExercises;
+  if(!map||typeof map!=='object'||!Array.isArray(map[dayKey])) return [];
+  return [...new Set(map[dayKey].map(Number).filter(index=>Number.isInteger(index)&&index>=0))];
+}
+function isPresetDeleted(dayKey,index){return getDeletedPresetIndexes(dayKey).includes(index);}
+function activeBaseExerciseTotal(dayKey,baseTotal){return Math.max(0,baseTotal-getDeletedPresetIndexes(dayKey).filter(index=>index<baseTotal).length);}
+function dayExerciseTotal(dayKey,baseTotal){return activeBaseExerciseTotal(dayKey,baseTotal)+getCustomExercises(dayKey).length;}
+function baseExerciseRowsHTML(day){
+  return day.ex.map((exercise,index)=>{
+    if(isPresetDeleted(day.key,index)) return '';
+    return `<div class="ex preset-ex" data-day="${day.key}" data-i="${index}">
+      <label class="cbx"><input type="checkbox" ${isChecked(day.key,index)?'checked':''}
+        onchange="onCheck('${day.key}',${index},this)"><span class="box"></span></label>
+      <div class="body">
+        <div class="nm">${exercise.n}</div>
+        <div class="meta">${exercise.sets!=='—'?'<b>'+exercise.sets+'</b> 组 × ':''}<b>${exercise.reps}</b></div>
+        ${exercise.note?`<div class="note">${exercise.note}</div>`:''}
+      </div>
+      <a class="vid-link" href="https://www.youtube.com/results?search_query=${encodeURIComponent(exercise.v||exercise.n+' proper form tutorial')}" target="_blank" rel="noopener" title="观看「${exercise.n}」视频教程">▶ 教程</a>
+      <button class="custom-remove preset-remove" type="button" onclick="removePresetExercise('${day.key}',${index})" aria-label="删除预设运动 ${exercise.n}" title="删除预设运动">×</button>
+    </div>`;
+  }).join('');
+}
 function customExerciseRowsHTML(dayKey){
   return getCustomExercises(dayKey).map(item=>{
     const id=String(item.id),sets=String(item.sets||'').trim(),reps=String(item.reps||'').trim();
@@ -1113,7 +1136,7 @@ function setExerciseLibraryOpen(open,persist){
 function normalizeExerciseName(value){return String(value||'').trim().toLocaleLowerCase().replace(/\s+/g,' ');}
 function isLibraryExerciseAdded(item){
   const name=normalizeExerciseName(item.name);
-  return todayObj.ex.some(entry=>normalizeExerciseName(entry.n)===name)||getCustomExercises(todayObj.key).some(entry=>entry.libraryId===item.id||normalizeExerciseName(entry.name)===name);
+  return todayObj.ex.some((entry,index)=>!isPresetDeleted(todayObj.key,index)&&normalizeExerciseName(entry.n)===name)||getCustomExercises(todayObj.key).some(entry=>entry.libraryId===item.id||normalizeExerciseName(entry.name)===name);
 }
 function renderExerciseLibraryFilters(){
   const root=document.getElementById('exercise-library-filters');if(!root) return;
@@ -1189,28 +1212,18 @@ DAYS.forEach(d=>{
   const card=document.createElement('div');
   card.className='daycard'+(d.dow===todayDow?' is-today':'');
   card.id='day-'+d.dow;
-  const exHTML=d.ex.map((e,i)=>`
-    <div class="ex" data-day="${d.key}" data-i="${i}">
-      <label class="cbx"><input type="checkbox" ${isChecked(d.key,i)?'checked':''}
-        onchange="onCheck('${d.key}',${i},this)"><span class="box"></span></label>
-      <div class="body">
-        <div class="nm">${e.n}</div>
-        <div class="meta">${e.sets!=='—'?'<b>'+e.sets+'</b> 组 × ':''}<b>${e.reps}</b></div>
-        ${e.note?`<div class="note">${e.note}</div>`:''}
-      </div>
-      <a class="vid-link" href="https://www.youtube.com/results?search_query=${encodeURIComponent(e.v||e.n+' proper form tutorial')}" target="_blank" rel="noopener" title="观看「${e.n}」视频教程">▶ 教程</a>
-    </div>`).join('');
   card.innerHTML=`
     <div class="dc-head ${d.cat}">
       <span class="ico">${CATICON[d.cat]}</span>
       <div><div class="t">${d.label} · ${d.name}</div><div class="s">${CATLABEL[d.cat]}${d.tag?' · '+d.tag:''}</div></div>
       ${d.dow===todayDow?'<span class="todaytag">今日</span>':''}
     </div>
-    ${exHTML}
+    <div class="preset-exercises" id="preset-exercises-${d.dow}">${baseExerciseRowsHTML(d)}</div>
     <div class="custom-exercises" id="custom-exercises-${d.dow}">${customExerciseRowsHTML(d.key)}</div>
     <div class="dc-foot">
       ${d.rest?`<span class="rest-i">休息 ${d.rest} 秒</span><button class="link-btn" onclick="setTimerAndOpen(${d.rest})">⏱️ 计时</button>`:'<span class="rest-i">主动恢复日</span>'}
       <button class="link-btn add-exercise-btn" onclick="openExerciseModal('${d.key}')">＋ 添加</button>
+      <button class="link-btn" id="restore-presets-${d.dow}" onclick="restorePresetExercises('${d.key}')" ${getDeletedPresetIndexes(d.key).length?'':'hidden'}>↺ 恢复预设</button>
       <button class="link-btn" onclick="resetDay('${d.key}')">重置</button>
       <span class="prog-mini" id="pm-${d.dow}"></span>
     </div>`;
@@ -1239,6 +1252,12 @@ document.getElementById('weeks').innerHTML=WEEKS.map(w=>`
 
 /* ============ CHECK / PROGRESS ============ */
 let exerciseModalDayKey='';
+function renderBaseExerciseList(dayKey){
+  const day=DAYS.find(item=>item.key===dayKey),root=day&&document.getElementById('preset-exercises-'+day.dow);
+  if(root) root.innerHTML=baseExerciseRowsHTML(day);
+  const restore=day&&document.getElementById('restore-presets-'+day.dow);
+  if(restore) restore.hidden=getDeletedPresetIndexes(dayKey).length===0;
+}
 function renderCustomExerciseList(dayKey){
   const day=DAYS.find(item=>item.key===dayKey),root=day&&document.getElementById('custom-exercises-'+day.dow);
   if(root) root.innerHTML=customExerciseRowsHTML(dayKey);
@@ -1284,6 +1303,19 @@ function removeCustomExercise(dayKey,id){
   state.__customExercises[dayKey]=list.filter(entry=>String(entry.id)!==id);
   if(state[dayKey]) delete state[dayKey][customCheckKey(id)];
   saveState(state);renderCustomExerciseList(dayKey);updateProgress();renderCalendar();scheduleCompetitionDaySync(dayKey);if(dayKey===todayObj.key) renderExerciseLibrary();
+}
+function removePresetExercise(dayKey,index){
+  const day=DAYS.find(item=>item.key===dayKey),exercise=day&&day.ex[index];if(!exercise||isPresetDeleted(dayKey,index)) return;
+  if(!confirm('从当天内容中删除预设运动“'+exercise.n+'”？可使用“恢复预设”找回。')) return;
+  if(!state.__deletedExercises||typeof state.__deletedExercises!=='object'||Array.isArray(state.__deletedExercises)) state.__deletedExercises={};
+  state.__deletedExercises[dayKey]=[...getDeletedPresetIndexes(dayKey),index].sort((a,b)=>a-b);
+  if(state[dayKey]) delete state[dayKey][index];
+  saveState(state);renderBaseExerciseList(dayKey);updateProgress();renderCalendar();scheduleCompetitionDaySync(dayKey);if(dayKey===todayObj.key) renderExerciseLibrary();
+}
+function restorePresetExercises(dayKey){
+  if(!getDeletedPresetIndexes(dayKey).length) return;
+  delete state.__deletedExercises[dayKey];
+  saveState(state);renderBaseExerciseList(dayKey);updateProgress();renderCalendar();scheduleCompetitionDaySync(dayKey);if(dayKey===todayObj.key) renderExerciseLibrary();
 }
 document.getElementById('exercise-modal-close').onclick=closeExerciseModal;
 document.getElementById('exercise-modal').addEventListener('mousedown',event=>{if(event.target.id==='exercise-modal')closeExerciseModal();});
@@ -1350,7 +1382,7 @@ let calY=now.getFullYear(), calM=now.getMonth();
 function planFor(d){return DAYS.find(x=>x.dow===d.getDay());}
 function dayDoneCount(k,baseTotal){
   const r=state[k]||{};
-  let n=0;for(let i=0;i<baseTotal;i++) if(r[i]) n++;
+  let n=0;for(let i=0;i<baseTotal;i++) if(!isPresetDeleted(k,i)&&r[i]) n++;
   getCustomExercises(k).forEach(item=>{if(r[customCheckKey(item.id)]) n++;});
   return n;
 }
@@ -1745,7 +1777,7 @@ initCompetitionModal();
 /* 把当前 state 同步到复选框 DOM（远端拉取覆盖后调用） */
 function applyStateToDOM(){
   renderProfile();
-  DAYS.forEach(day=>renderCustomExerciseList(day.key));
+  DAYS.forEach(day=>{renderBaseExerciseList(day.key);renderCustomExerciseList(day.key);});
   renderExerciseLibrary();
   document.querySelectorAll('.ex').forEach(ex=>{
     const k=ex.dataset.day,on=ex.dataset.customId?isCustomChecked(k,ex.dataset.customId):isChecked(k,+ex.dataset.i);
